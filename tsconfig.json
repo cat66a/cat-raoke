@@ -1,0 +1,14 @@
+{
+    "compilerOptions": {
+      "module": "system",
+      "moduleResolution": "Node",
+      "noImplicitAny": true,
+      "removeComments": true,
+      "preserveConstEnums": true,
+      "outFile": "./built/local/tsc.js",
+      "sourceMap": true,
+      
+    },
+    "include": ["src/**/*"],
+    "exclude": ["node_modules", ".yarn", "**/*.spec.ts"]
+  }
