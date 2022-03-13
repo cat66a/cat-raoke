@@ -1,10 +1,11 @@
-import { getInfo } from "ytdl-core";
+import { getInfo, videoInfo } from "ytdl-core";
 import {
   AudioResource,
   createAudioResource,
   demuxProbe,
 } from "@discordjs/voice";
 import { raw as ytdl } from "youtube-dl-exec";
+import { searchVideos } from "./youtube";
 
 /**
  * This is the data required to create a Track object.
@@ -38,7 +39,10 @@ export class Track {
   public readonly onFinish: () => void;
   public readonly onError: (error: Error) => void;
 
-  private constructor({onStart, onFinish, onError}:TrackEvents, data: TrackData) {
+  private constructor(
+    { onStart, onFinish, onError }: TrackEvents,
+    data: TrackData,
+  ) {
     this.data = data;
     this.onStart = Object.bind(onStart, this);
     this.onFinish = Object.bind(onFinish, this);
@@ -91,16 +95,32 @@ export class Track {
   /**
    * Creates a Track from a video URL and lifecycle callback methods.
    *
-   * @param url The URL of the video
+   * @param query The URL of the video
    * @param methods Lifecycle callbacks
    *
    * @returns The created Track
    */
   public static async from(
-    url: string,
+    query: string,
     methods: Pick<Track, "onStart" | "onFinish" | "onError">,
   ): Promise<Track> {
-    const info = await getInfo(url);
+    let info: videoInfo;
+    let url: string;
+
+    try {
+      url = query;
+      info = await getInfo(url);
+    } catch (error) {
+      if (((error.message) as string).includes("No video id found")) {
+        const searchResults = await searchVideos(query, 1);
+        const videoId = searchResults.items[0].id.videoId;
+        url = `https://www.youtube.com/watch?v=${videoId}`;
+
+        info = await getInfo(url);
+      } else {
+        throw error;
+      }
+    }
 
     // The methods are wrapped so that we can ensure that they are only called once.
     const wrappedMethods = {
@@ -119,9 +139,11 @@ export class Track {
     };
 
     return new Track(
-      wrappedMethods, {
-      title: info.videoDetails.title,
-      url: url,
-    });
+      wrappedMethods,
+      {
+        title: info.videoDetails.title,
+        url,
+      },
+    );
   }
 }
