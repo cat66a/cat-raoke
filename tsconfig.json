@@ -3,12 +3,12 @@
       "target": "es2020",
       "module": "CommonJS",
       "moduleResolution": "Node",
+      "esModuleInterop": true,
       "noImplicitAny": true,
       "removeComments": true,
       "preserveConstEnums": true,
       "outDir": "./built",
       "sourceMap": true,
-      
     },
     "include": ["src/**/*"],
     "exclude": ["node_modules", ".yarn", "**/*.spec.ts"]
