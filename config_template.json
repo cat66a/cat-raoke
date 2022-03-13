@@ -1,4 +1,6 @@
 {
     "bot_token": "ur bot token",
-    "guild_id": "the guild id of ur server"
+    "main_guild_id": "the main guild's id (might be deleted later idk)",
+    "bot_owner_id": "the bot owner's id",
+    "guild_ids": ["an array of whitelisted guilds that can use the slash commands"]
 }
