@@ -1,10 +1,13 @@
 import { Client, CommandInteraction, Intents } from "discord.js";
 import { commands, loadCommands } from "./commands";
-import { command } from "./commands/ping";
 import { bot_token } from "./loadedConfig";
 import { RestLoadingApplicationCommands } from "./rest";
 
-const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
+const { FLAGS } = Intents;
+
+const client = new Client({
+  intents: [FLAGS.GUILDS, FLAGS.GUILD_VOICE_STATES, FLAGS.GUILD_MEMBERS],
+});
 
 async function init() {
   console.log('Loading commands inside "commands" dir');
@@ -33,12 +36,12 @@ async function init() {
 
         const command = commands.get(commandName);
 
-        await command.execute(interaction);
+        await command.preExec(interaction);
       } catch (error) {
         await interactionErrorHandler(interaction, error);
       }
     } catch (error2) {
-      console.error(error2);
+      console.warn(error2);
     }
   });
 
@@ -46,7 +49,7 @@ async function init() {
     interaction: CommandInteraction,
     error: Error,
   ) {
-    console.error(error);
+    console.warn(error);
   }
 
   await client.login(bot_token);

@@ -1,7 +1,7 @@
 import { CommandInteraction } from "discord.js";
-import { IBaseSlashCommand } from "../ISlashCommand";
+import { BaseSlashCommand } from "../slashCommand";
 
-class ClassCommand extends IBaseSlashCommand {
+class PingCommand extends BaseSlashCommand {
   constructor() {
     super({ name: "ping", description: "sausage" });
   }
@@ -10,4 +10,4 @@ class ClassCommand extends IBaseSlashCommand {
   }
 }
 
-export const command = new ClassCommand();
+export const command = new PingCommand();
