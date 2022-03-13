@@ -11,6 +11,8 @@
     "erlpack": "^0.1.4",
     "sodium": "^3.0.2",
     "utf-8-validate": "^5.0.8",
+    "youtube-dl-exec": "^1.3.4",
+    "ytdl-core": "^4.10.1",
     "zlib-sync": "^0.1.7"
   },
   "devDependencies": {
