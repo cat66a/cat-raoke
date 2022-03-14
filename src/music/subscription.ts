@@ -11,7 +11,7 @@ import {
   VoiceConnectionState,
   VoiceConnectionStatus,
 } from "@discordjs/voice";
-import type { Track } from "./track";
+import type { Track } from "./track.js";
 import { promisify } from "node:util";
 import {
   CommandInteraction,
@@ -76,7 +76,7 @@ export const joinVCAndCreateSubscription = async (
     }
 
     await interaction.followUp(
-      `J'ai rejoins le salon vocal \`${
+      `J'ai rejoint le salon vocal \`${
         (await subscription.voiceChannel).name
       }\``,
     );

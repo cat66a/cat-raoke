@@ -1,6 +1,5 @@
-const import_path = "../config";
-
-const config = require(import_path);
+// @ts-ignore
+import config from "../config.json" assert { type: "json" };
 
 const bot_token: string = config.bot_token;
 const main_guild_id: string = config.main_guild_id;

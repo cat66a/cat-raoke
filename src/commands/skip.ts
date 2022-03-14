@@ -1,6 +1,6 @@
 import { CommandInteraction, GuildMember } from "discord.js";
-import { MusicSubscription } from "../music/subscription";
-import { MusicSlashCommand } from "../slashCommand";
+import { MusicSubscription } from "../music/subscription.js";
+import { MusicSlashCommand } from "../slashCommand.js";
 
 class SkipCommand extends MusicSlashCommand {
   constructor() {

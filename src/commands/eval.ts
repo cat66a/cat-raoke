@@ -1,15 +1,18 @@
 import { CommandInteraction } from "discord.js";
-import { clean } from "../utils";
-import {
-  AdminSlashCommand,
-  BaseSlashCommand,
-  MusicSlashCommand,
-} from "../slashCommand";
-import { MusicSubscription, subscriptions } from "../music/subscription";
-import { Track } from "../music/track";
-import { commandPropertiesArray, commands, loadCommands } from "../commands";
-import * as config from "../loadedConfig";
-import { RestLoadingApplicationCommands } from "../rest";
+
+const { clean } = await import("../utils.js");
+const { AdminSlashCommand, BaseSlashCommand, MusicSlashCommand } = await import(
+  "../slashCommand.js"
+);
+const { MusicSubscription, joinVCAndCreateSubscription, subscriptions } =
+  await import("../music/subscription.js");
+const { Track } = await import("../music/track.js");
+const { commandPropertiesArray, commands, loadCommands } = await import(
+  "../commands.js"
+);
+const botConfig = await import("../loadedConfig.js");
+const { RestLoadingApplicationCommands } = await import("../rest.js");
+const lgbt = await import("../pfp_lgbtapi_wrapper.js");
 
 class EvalCommand extends AdminSlashCommand {
   constructor() {

@@ -1,11 +1,17 @@
-import { getInfo, videoInfo } from "ytdl-core";
+import { videoInfo } from "ytdl-core";
 import {
   AudioResource,
   createAudioResource,
   demuxProbe,
 } from "@discordjs/voice";
-import { raw as ytdl } from "youtube-dl-exec";
-import { searchVideos } from "./youtube";
+import { searchVideos } from "./youtubeapi_wrapper.js";
+
+import pkg from "youtube-dl-exec";
+// @ts-ignore
+const { raw: ytdl } = pkg;
+
+import ytdl_core from "ytdl-core";
+const { getInfo } = ytdl_core;
 
 /**
  * This is the data required to create a Track object.

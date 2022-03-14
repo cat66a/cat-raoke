@@ -8,9 +8,9 @@ import {
   joinVCAndCreateSubscription,
   MusicSubscription,
   subscriptions,
-} from "../music/subscription";
-import { Track } from "../music/track";
-import { MusicSlashCommand } from "../slashCommand";
+} from "../music/subscription.js";
+import { Track } from "../music/track.js";
+import { MusicSlashCommand } from "../slashCommand.js";
 
 class PlayCommand extends MusicSlashCommand {
   constructor() {

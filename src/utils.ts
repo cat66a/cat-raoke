@@ -1,7 +1,7 @@
 // This function cleans up and prepares the
 // result of our eval command input for sending
 
-import { bot_token } from "./loadedConfig";
+import { bot_token } from "./loadedConfig.js";
 
 // to the channel
 export const clean = async (text: any): Promise<string> => {
@@ -15,7 +15,7 @@ export const clean = async (text: any): Promise<string> => {
   // won't error out on objects with circular references
   // (like Collections, for example)
   if (typeof text !== "string") {
-    text = require("util").inspect(text, { depth: 1 });
+    text = (await import("util")).inspect(text, { depth: 1 });
   }
 
   // Replace symbols with character code alternatives

@@ -1,7 +1,7 @@
 import { REST } from "@discordjs/rest";
 import { Routes } from "discord-api-types/v9";
-import { bot_token, guild_ids, main_guild_id } from "./loadedConfig";
-import { commandPropertiesArray } from "./commands";
+import { bot_token, guild_ids, main_guild_id } from "./loadedConfig.js";
+import { commandPropertiesArray } from "./commands.js";
 
 const rest = new REST({ version: "9" }).setToken(bot_token);
 
@@ -17,7 +17,8 @@ export async function RestLoadingApplicationCommands() {
       commandProps.global
     );
 
-    /* const getGlobalCommands = await rest.get(
+    /*
+    const getGlobalCommands = await rest.get(
       Routes.applicationCommands(client_id),
     ) as [{ id: string }];
 

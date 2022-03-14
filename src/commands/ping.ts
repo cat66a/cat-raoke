@@ -1,5 +1,5 @@
 import { CommandInteraction } from "discord.js";
-import { BaseSlashCommand } from "../slashCommand";
+import { BaseSlashCommand } from "../slashCommand.js";
 
 class PingCommand extends BaseSlashCommand {
   constructor() {

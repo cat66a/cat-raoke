@@ -1,4 +1,4 @@
-import { BaseSlashCommand } from "./slashCommand";
+import { BaseSlashCommand } from "./slashCommand.js";
 import { readdirSync } from "fs";
 
 export let commands = new Map<string, BaseSlashCommand>();
@@ -20,17 +20,17 @@ export let commandPropertiesArray = () => {
 export async function loadCommands() {
   const files = readdirSync("./built/commands/");
 
-  files.forEach((fileName) => {
+  Promise.all(files.map(async (fileName) => {
     if (fileName.endsWith(".js.map")) return;
 
     let commandName = fileName.replace(".js", "");
 
     const command: BaseSlashCommand =
-      require(`./commands/${commandName}`).command;
+      (await import(`./commands/${fileName}`)).command;
 
     // In case the file name and the object properties.name property don't match
     commandName = command.properties.name;
 
     commands.set(commandName, command);
-  });
+  }));
 }
