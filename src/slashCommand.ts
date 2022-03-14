@@ -50,6 +50,12 @@ export class BaseSlashCommand implements IOtherProps {
   }
 
   preExec(interaction: CommandInteraction): Promise<void> {
+    if (this.admin && interaction.member.user.id !== bot_owner_id) {
+      return interaction.reply(
+        "Cette commande est réservée au propriétaire du bot, tu ne peux pas l'utiliser",
+      );
+    }
+
     return this.prepare(interaction);
   }
 
@@ -83,5 +89,14 @@ export class MusicSlashCommand extends BaseSlashCommand {
     subscription: MusicSubscription,
   ): Promise<void> {
     throw new Error("Method not implemented.");
+  }
+}
+
+export class AdminSlashCommand extends BaseSlashCommand {
+  constructor(
+    APIProperties: Omit<IApplicationCommandProperties, "type">,
+    permissions?: APIApplicationCommandPermission[],
+  ) {
+    super(APIProperties, { admin: true, global: true }, permissions);
   }
 }
