@@ -41,18 +41,11 @@ const noop = () => {};
  */
 export class Track {
   public readonly data: TrackData;
-  public readonly onStart: () => void;
-  public readonly onFinish: () => void;
-  public readonly onError: (error: Error) => void;
 
   private constructor(
-    { onStart, onFinish, onError }: TrackEvents,
     data: TrackData,
   ) {
     this.data = data;
-    this.onStart = Object.bind(onStart, this);
-    this.onFinish = Object.bind(onFinish, this);
-    this.onError = Object.bind(onError, this);
   }
 
   /**
@@ -63,7 +56,6 @@ export class Track {
       const process = ytdl(
         this.data.url,
         {
-          // @ts-ignore
           o: "-",
           q: "",
           f: "bestaudio[ext=webm+acodec=opus+asr=48000]/bestaudio",
@@ -108,7 +100,6 @@ export class Track {
    */
   public static async from(
     query: string,
-    methods: Pick<Track, "onStart" | "onFinish" | "onError">,
   ): Promise<Track> {
     let info: videoInfo;
     let url: string;
@@ -130,24 +121,7 @@ export class Track {
     }
 
     console.log("3");
-    // The methods are wrapped so that we can ensure that they are only called once.
-    const wrappedMethods = {
-      onStart() {
-        wrappedMethods.onStart = noop;
-        methods.onStart();
-      },
-      onFinish() {
-        wrappedMethods.onFinish = noop;
-        methods.onFinish();
-      },
-      onError(error: Error) {
-        wrappedMethods.onError = noop;
-        methods.onError(error);
-      },
-    };
-
     return new Track(
-      wrappedMethods,
       {
         title: info.videoDetails.title,
         url,

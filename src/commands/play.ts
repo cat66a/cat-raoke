@@ -43,16 +43,7 @@ class PlayCommand extends MusicSlashCommand {
 
     console.log("1");
     try {
-      const track = await Track.from(query, {
-        onStart() {},
-        onFinish() {},
-        async onError(error) {
-          console.warn(error);
-          (await (subscription as MusicSubscription).textChannel).send(
-            `Erreur: ${error.message}`,
-          );
-        },
-      });
+      const track = await Track.from(query);
 
       console.log("5");
       subscription.enqueue(track);
