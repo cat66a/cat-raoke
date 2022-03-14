@@ -7,4 +7,6 @@ const main_guild_id: string = config.main_guild_id;
 const bot_owner_id: string = config.bot_owner_id;
 const guild_ids: [string] = config.guild_ids;
 
-export { bot_owner_id, bot_token, guild_ids, main_guild_id };
+const googleapis_token: string = config.googleapis_token;
+
+export { bot_owner_id, bot_token, googleapis_token, guild_ids, main_guild_id };
