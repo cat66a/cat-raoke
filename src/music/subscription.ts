@@ -80,9 +80,9 @@ export const joinVCAndCreateSubscription = async (
         (await subscription.voiceChannel).name
       }\``,
     );
-
-    return subscription;
   }
+
+  return subscription;
 };
 /**
  * A MusicSubscription exists for each active VoiceConnection. Each subscription has its own audio player and queue,
@@ -226,7 +226,6 @@ export class MusicSubscription {
   }
 
   get voiceChannel() {
-    console.log(this.voiceChannelId);
     return (this.guildChannels.fetch(
       this.voiceChannelId,
     ) as Promise<VoiceChannel>);
@@ -275,7 +274,11 @@ export class MusicSubscription {
       this.queueLock = false;
     } catch (error) {
       // If an error occurred, try the next item of the queue instead
-      nextTrack.onError(error as Error);
+      try {
+        await nextTrack.onError(error as Error);
+      } catch (error) {
+        console.warn(error);
+      }
       this.queueLock = false;
       return this.processQueue();
     }
