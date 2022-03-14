@@ -26,7 +26,7 @@ class PlayCommand extends MusicSlashCommand {
           required: true,
         },
       ],
-    });
+    }, { global: true });
   }
   async execute(
     interaction: CommandInteraction,

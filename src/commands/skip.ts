@@ -7,7 +7,7 @@ class SkipCommand extends MusicSlashCommand {
     super({
       name: "skip",
       description: "Permet de passer une piste et lancer la prochaine",
-    });
+    }, { global: true });
   }
   async execute(
     interaction: CommandInteraction,

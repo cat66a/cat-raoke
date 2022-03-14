@@ -3,10 +3,7 @@ import { BaseSlashCommand } from "../slashCommand";
 
 class PingCommand extends BaseSlashCommand {
   constructor() {
-    super({ name: "ping", description: "pong" }, {
-      admin: false,
-      global: true,
-    });
+    super({ name: "ping", description: "pong" }, { global: true });
   }
   async execute(interaction: CommandInteraction): Promise<void> {
     interaction.reply("Pong 🏓");
