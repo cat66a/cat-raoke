@@ -32,26 +32,33 @@ class PlayCommand extends MusicSlashCommand {
     interaction: CommandInteraction,
     subscription: void | MusicSubscription,
   ): Promise<void> {
+    console.log("beginning");
     await interaction.deferReply();
 
     const query = interaction.options.get("query")!.value! as string;
-
     console.log(query);
+
     subscription = await joinVCAndCreateSubscription(subscription, interaction);
     if (!subscription) return;
 
+    console.log("1");
     try {
       const track = await Track.from(query, {
         onStart() {},
         onFinish() {},
-        onError(error) {
+        async onError(error) {
           console.warn(error);
-          interaction.followUp(`Erreur: ${error.message}`).catch(console.warn);
+          (await (subscription as MusicSubscription).textChannel).send(
+            `Erreur: ${error.message}`,
+          );
         },
       });
 
+      console.log("5");
       subscription.enqueue(track);
+      console.log("6");
       await interaction.followUp(`Piste rajoutée : \`${track.data.title}\``);
+      console.log("7");
     } catch (error) {
       console.warn(error);
 

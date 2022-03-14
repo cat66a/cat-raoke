@@ -107,6 +107,7 @@ export class Track {
     let info: videoInfo;
     let url: string;
 
+    console.log("2");
     try {
       url = query;
       info = await getInfo(url);
@@ -122,6 +123,7 @@ export class Track {
       }
     }
 
+    console.log("3");
     // The methods are wrapped so that we can ensure that they are only called once.
     const wrappedMethods = {
       onStart() {
