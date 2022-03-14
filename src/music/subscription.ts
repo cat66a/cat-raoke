@@ -200,11 +200,15 @@ export class MusicSubscription {
         ) {
           // If the Idle state is entered from a non-Idle state, it means that an audio resource has finished playing.
           // The queue is then processed to start playing the next track, if one is available.
-          (oldState.resource as AudioResource<Track>).metadata.onFinish();
+
           void this.processQueue();
         } else if (newState.status === AudioPlayerStatus.Playing) {
-          // If the Playing state has been entered, then a new track has started playback.
-          (newState.resource as AudioResource<Track>).metadata.onStart();
+          const songTitle =
+            (newState.resource as AudioResource<Track>).metadata.data.title;
+
+          this.textChannel.then((channel) =>
+            channel.send(`En cours de lecture: \`${songTitle}\``)
+          ).catch(this.onError);
         }
       },
     );
@@ -213,7 +217,7 @@ export class MusicSubscription {
       "error",
       (error: { resource: any }) =>
         // @ts-ignore
-        (error.resource as AudioResource<Track>).metadata.onError(error),
+        this.onError(error),
     );
 
     voiceConnection.subscribe(this.audioPlayer);
@@ -262,6 +266,7 @@ export class MusicSubscription {
     ) {
       return;
     }
+
     // Lock the queue to guarantee safe access
     this.queueLock = true;
 
@@ -274,21 +279,15 @@ export class MusicSubscription {
       this.queueLock = false;
     } catch (error) {
       // If an error occurred, try the next item of the queue instead
-      try {
-        await nextTrack.onError(error as Error);
-      } catch (error) {
-        console.warn(error);
-      }
+      this.onError(error);
       this.queueLock = false;
+
       return this.processQueue();
     }
+  }
 
-    try {
-      (await this.textChannel).send(
-        `En cours de lecture: \`${nextTrack.data.title}\``,
-      );
-    } catch (error) {
-      console.warn(error);
-    }
+  private async onError(error: any) {
+    console.warn(error);
+    await (await (this.textChannel)).send(`Erreur: \`${error.message}\``);
   }
 }
