@@ -4,7 +4,11 @@ import {
   VoiceConnectionStatus,
 } from "@discordjs/voice";
 import { CommandInteraction, GuildMember } from "discord.js";
-import { MusicSubscription, subscriptions } from "../music/subscription";
+import {
+  joinVCAndCreateSubscription,
+  MusicSubscription,
+  subscriptions,
+} from "../music/subscription";
 import { Track } from "../music/track";
 import { MusicSlashCommand } from "../slashCommand";
 
@@ -15,9 +19,10 @@ class PlayCommand extends MusicSlashCommand {
       description: "Lance une chanson ou l'ajoute dans la file d'attente",
       options: [
         {
-          name: "song",
+          name: "query",
           type: 3,
-          description: "L'URL de la piste à jouer",
+          description:
+            "Des mots-clés ou une URL correspondant à la piste à jouer",
           required: true,
         },
       ],
@@ -25,61 +30,18 @@ class PlayCommand extends MusicSlashCommand {
   }
   async execute(
     interaction: CommandInteraction,
-    subscription: MusicSubscription,
+    subscription: void | MusicSubscription,
   ): Promise<void> {
     await interaction.deferReply();
 
-    const url = interaction.options.get("song")!.value! as string;
+    const query = interaction.options.get("query")!.value! as string;
 
-    console.log(url);
-    if (!subscription) {
-      if (
-        interaction.member instanceof GuildMember &&
-        interaction.member.voice.channel
-      ) {
-        const voiceChannel = interaction.member.voice.channel;
-
-        subscription = new MusicSubscription(
-          joinVoiceChannel({
-            channelId: voiceChannel.id,
-            guildId: voiceChannel.guildId,
-            adapterCreator: voiceChannel.guild.voiceAdapterCreator,
-          }),
-          {
-            textChannelId: interaction.channelId,
-            guildChannels: interaction.guild.channels,
-            voiceChannelId: voiceChannel.id,
-          },
-        );
-
-        subscription.voiceConnection.on("error", console.warn);
-        subscriptions.set(interaction.guildId, subscription);
-      }
-    }
-
-    if (!subscription) {
-      await interaction.followUp(
-        "Rejoins un salon vocal et ensuite essaye à nouveau ^^",
-      );
-      return;
-    }
+    console.log(query);
+    subscription = await joinVCAndCreateSubscription(subscription, interaction);
+    if (!subscription) return;
 
     try {
-      await entersState(
-        subscription.voiceConnection,
-        VoiceConnectionStatus.Ready,
-        20e3,
-      );
-    } catch (error) {
-      console.warn(error);
-      await interaction.followUp(
-        "Je n'ai pas réussi à rejoindre le salon vocal dans les 20 secondes, veuillez réessayer plus tard",
-      );
-      return;
-    }
-
-    try {
-      const track = await Track.from(url, {
+      const track = await Track.from(query, {
         onStart() {},
         onFinish() {},
         onError(error) {
@@ -95,7 +57,7 @@ class PlayCommand extends MusicSlashCommand {
 
       if (((error.message) as string).includes("No video id found")) {
         await interaction.followUp(
-          "Aucune piste trouvée, vous pouvez réessayer avec d'autres mots-clés/un autre lien",
+          "Aucune piste trouvée, vous pouvez réessayer avec d'autres mots-clés/un autre lien, ou réessayer plus tard",
         );
       } else {
         await interaction.followUp(

@@ -5,6 +5,7 @@ import {
   AudioResource,
   createAudioPlayer,
   entersState,
+  joinVoiceChannel,
   VoiceConnection,
   VoiceConnectionDisconnectReason,
   VoiceConnectionState,
@@ -13,38 +14,100 @@ import {
 import type { Track } from "./track";
 import { promisify } from "node:util";
 import {
+  CommandInteraction,
   GuildChannelManager,
+  GuildMember,
   GuildTextBasedChannel,
   Snowflake,
+  VoiceChannel,
 } from "discord.js";
 
 const wait = promisify(setTimeout);
 
 export const subscriptions = new Map<Snowflake, MusicSubscription>();
 
+export const joinVCAndCreateSubscription = async (
+  subscription: void | MusicSubscription,
+  interaction: CommandInteraction,
+): Promise<void | MusicSubscription> => {
+  if (!subscription) {
+    if (
+      interaction.member instanceof GuildMember &&
+      interaction.member.voice.channel
+    ) {
+      const voiceChannel = interaction.member.voice.channel;
+
+      subscription = new MusicSubscription(
+        joinVoiceChannel({
+          channelId: voiceChannel.id,
+          guildId: voiceChannel.guildId,
+          adapterCreator: voiceChannel.guild.voiceAdapterCreator,
+        }),
+        {
+          textChannelId: interaction.channelId,
+          guildChannels: interaction.guild.channels,
+          voiceChannelId: voiceChannel.id,
+        },
+      );
+
+      subscription.voiceConnection.on("error", console.warn);
+      subscriptions.set(interaction.guildId, subscription);
+    }
+
+    if (!subscription) {
+      await interaction.followUp(
+        "Rejoins un salon vocal et ensuite essaye à nouveau ^^",
+      );
+      return;
+    }
+
+    try {
+      await entersState(
+        subscription.voiceConnection,
+        VoiceConnectionStatus.Ready,
+        20e3,
+      );
+    } catch (error) {
+      console.warn(error);
+      await interaction.followUp(
+        "Je n'ai pas réussi à rejoindre le salon vocal dans les 20 secondes, veuillez réessayer plus tard",
+      );
+      return;
+    }
+
+    await interaction.followUp(
+      `J'ai rejoins le salon vocal \`${
+        (await subscription.voiceChannel).name
+      }\``,
+    );
+
+    return subscription;
+  }
+};
 /**
  * A MusicSubscription exists for each active VoiceConnection. Each subscription has its own audio player and queue,
  * and it also attaches logic to the audio player and voice connection for error handling and reconnection logic.
  */
 export class MusicSubscription {
+  public readonly guildChannels: GuildChannelManager;
+  public readonly textChannelId: Snowflake;
   public readonly voiceChannelId: Snowflake;
+
   public readonly voiceConnection: VoiceConnection;
   public readonly audioPlayer: AudioPlayer;
   public queue: Track[];
   public queueLock = false;
   public readyLock = false;
-  public readonly textChannelId: Snowflake;
-  public readonly guildChannels: GuildChannelManager;
 
   public constructor(
     voiceConnection: VoiceConnection,
     options: {
       voiceChannelId: Snowflake;
-
       textChannelId: Snowflake;
       guildChannels: GuildChannelManager;
     },
   ) {
+    this.voiceChannelId = options.voiceChannelId;
     this.textChannelId = options.textChannelId;
     this.guildChannels = options.guildChannels;
 
@@ -160,6 +223,13 @@ export class MusicSubscription {
     return (this.guildChannels.fetch(
       this.textChannelId,
     ) as Promise<GuildTextBasedChannel>);
+  }
+
+  get voiceChannel() {
+    console.log(this.voiceChannelId);
+    return (this.guildChannels.fetch(
+      this.voiceChannelId,
+    ) as Promise<VoiceChannel>);
   }
 
   /**
