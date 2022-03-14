@@ -52,7 +52,13 @@ export class BaseSlashCommand implements IOtherProps {
   preExec(interaction: CommandInteraction): Promise<void> {
     if (this.admin && interaction.member.user.id !== bot_owner_id) {
       return interaction.reply(
-        "Cette commande est réservée au propriétaire du bot, tu ne peux pas l'utiliser",
+        "Cette commande est réservée à la propriétaire du bot, tu ne peux pas l'utiliser",
+      );
+    }
+
+    if (!guild_ids.includes(interaction.guildId)) {
+      return interaction.reply(
+        "Ce serveur n'est pas autorisé à utiliser les commandes du bot\nSi cela n'est pas normal/prévu, veuillez contacter la propriétaire du bot",
       );
     }
 
