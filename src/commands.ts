@@ -5,13 +5,21 @@ export let commands = new Map<string, BaseSlashCommand>();
 export let commandPropertiesArray = () => {
   const commandArray = Array.from(commands.values());
 
-  return commandArray.map((command) => command.properties);
+  return commandArray.map(
+    ({ properties: APIProperties, permissions, admin, global }) => {
+      return {
+        APIProperties,
+        permissions,
+        admin,
+        global,
+      };
+    },
+  );
 };
 
 export async function loadCommands() {
   const files = readdirSync("./built/commands/");
 
-  console.log(files);
   files.forEach((fileName) => {
     if (fileName.endsWith(".js.map")) return;
 
