@@ -1,23 +1,32 @@
-import { APIApplicationCommandPermission } from "discord-api-types/v9";
 import {
-  BaseApplicationCommandOptionsData,
-  CacheType,
-  CommandInteraction,
-} from "discord.js";
+  APIApplicationCommandPermission,
+  ChannelType,
+} from "discord-api-types/v9";
+import { CommandInteraction } from "discord.js";
 import {
   ApplicationCommandOptionTypes,
   ApplicationCommandTypes,
 } from "discord.js/typings/enums";
-import { bot_owner_id, guild_ids } from "./loadedConfig";
-import { MusicSubscription, subscriptions } from "./music/subscription";
+import { bot_owner_id, guild_ids } from "./loadedConfig.js";
+import { MusicSubscription, subscriptions } from "./music/subscription.js";
 
+export interface IApplicationCommandsOptionsData {
+  type: ApplicationCommandOptionTypes;
+  name: string;
+  description: string;
+  required?: boolean;
+  choices?: { name: string; value: string | number }[];
+  options?: IApplicationCommandsOptionsData[];
+  channel_types?: ChannelType[];
+  min_value?: number;
+  max_value?: number;
+  autocomplete?: boolean;
+}
 export interface IApplicationCommandProperties {
   type: ApplicationCommandTypes;
   name: string;
   description: string;
-  options?: [
-    BaseApplicationCommandOptionsData & { type: ApplicationCommandOptionTypes },
-  ];
+  options?: IApplicationCommandsOptionsData[];
   default_permission?: boolean;
 }
 
