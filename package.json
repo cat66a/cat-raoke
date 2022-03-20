@@ -3,7 +3,7 @@
   "main": "./index",
   "scripts": {
     "start": "node index.js",
-    "build": "rm --dir --recursive ./build/ && tsc"
+    "build": "rm --dir --recursive ./built/ && tsc"
   },
   "dependencies": {
     "@discordjs/opus": "^0.5.3",
