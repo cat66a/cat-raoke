@@ -4,7 +4,7 @@ import {
   createAudioResource,
   demuxProbe,
 } from "@discordjs/voice";
-import { searchVideos } from "./youtubeapi_wrapper.js";
+import { searchVideos } from "./youtubeApiWrapper.js";
 
 import pkg from "youtube-dl-exec";
 // @ts-ignore
@@ -24,7 +24,7 @@ export interface TrackData {
 export interface TrackEvents {
   onStart: () => void;
   onFinish: () => void;
-  onError: (error: Error) => void;
+  onError: (err: Error) => void;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-function
@@ -68,10 +68,10 @@ export class Track {
         return;
       }
       const stream = process.stdout;
-      const onError = (error: Error) => {
+      const onError = (err: Error) => {
         if (!process.killed) process.kill();
         stream.resume();
-        reject(error);
+        reject(err);
       };
       process
         .once("spawn", () => {
@@ -108,15 +108,15 @@ export class Track {
     try {
       url = query;
       info = await getInfo(url);
-    } catch (error) {
-      if (((error.message) as string).includes("No video id found")) {
+    } catch (err) {
+      if (((err.message) as string).includes("No video id found")) {
         const searchResults = await searchVideos(query, 1);
         const videoId = searchResults.items[0].id.videoId;
         url = `https://www.youtube.com/watch?v=${videoId}`;
 
         info = await getInfo(url);
       } else {
-        throw error;
+        throw err;
       }
     }
 

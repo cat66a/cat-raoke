@@ -1,6 +1,6 @@
 import { youtube_v3 } from "googleapis";
-import { googleapis_token } from "../loadedConfig.js";
-const key = googleapis_token;
+import { googleapisToken } from "../loadedConfig.js";
+const key = googleapisToken;
 
 const youtubeClient = new youtube_v3.Youtube({
   http2: true,

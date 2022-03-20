@@ -7,7 +7,7 @@ import {
   ApplicationCommandOptionTypes,
   ApplicationCommandTypes,
 } from "discord.js/typings/enums";
-import { bot_owner_id, guild_ids } from "./loadedConfig.js";
+import { botOwnerId, whitelistedGuildIds } from "./loadedConfig.js";
 import { MusicSubscription, subscriptions } from "./music/subscription.js";
 
 export interface IApplicationCommandsOptionsData {
@@ -32,40 +32,40 @@ export interface IApplicationCommandProperties {
 
 export interface IOtherProps {
   admin?: boolean;
-  global?: boolean;
+  public_?: boolean;
 }
 export class BaseSlashCommand implements IOtherProps {
   public readonly properties: IApplicationCommandProperties;
   public readonly permissions: APIApplicationCommandPermission[];
   public readonly admin: boolean;
-  public readonly global: boolean;
+  public readonly public_: boolean;
 
   constructor(
     APIProperties: Omit<IApplicationCommandProperties, "type">,
-    { admin, global }: IOtherProps,
+    { admin, public_ }: IOtherProps,
     permissions?: APIApplicationCommandPermission[],
   ) {
     this.properties = APIProperties as IApplicationCommandProperties;
     this.properties.type = 1;
 
     this.admin = admin;
-    this.global = global;
+    this.public_ = public_;
 
     this.permissions = permissions || [];
 
     if (admin) {
-      this.permissions.push({ id: bot_owner_id, type: 2, permission: true });
+      this.permissions.push({ id: botOwnerId, type: 2, permission: true });
     }
   }
 
   preExec(interaction: CommandInteraction): Promise<void> {
-    if (this.admin && interaction.member.user.id !== bot_owner_id) {
+    if (this.admin && interaction.member.user.id !== botOwnerId) {
       return interaction.reply(
         "Cette commande est réservée à la propriétaire du bot, tu ne peux pas l'utiliser",
       );
     }
 
-    if (!guild_ids.includes(interaction.guildId)) {
+    if (!whitelistedGuildIds.includes(interaction.guildId)) {
       return interaction.reply(
         "Ce serveur n'est pas autorisé à utiliser les commandes du bot\nSi cela n'est pas normal/prévu, veuillez contacter la propriétaire du bot",
       );
@@ -112,6 +112,6 @@ export class AdminSlashCommand extends BaseSlashCommand {
     APIProperties: Omit<IApplicationCommandProperties, "type">,
     permissions?: APIApplicationCommandPermission[],
   ) {
-    super(APIProperties, { admin: true, global: true }, permissions);
+    super(APIProperties, { admin: true, public_: true }, permissions);
   }
 }

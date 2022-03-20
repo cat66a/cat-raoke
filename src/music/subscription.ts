@@ -67,8 +67,8 @@ export const joinVCAndCreateSubscription = async (
         VoiceConnectionStatus.Ready,
         20e3,
       );
-    } catch (error) {
-      console.warn(error);
+    } catch (err) {
+      console.warn(err);
       await interaction.followUp(
         "Je n'ai pas réussi à rejoindre le salon vocal dans les 20 secondes, veuillez réessayer plus tard",
       );
@@ -207,7 +207,7 @@ export class MusicSubscription {
             (newState.resource as AudioResource<Track>).metadata.data.title;
 
           this.textChannel.then((channel) =>
-            channel.send(`En cours de lecture: \`${songTitle}\``)
+            channel.send(`En cours de lecture : \`${songTitle}\``)
           ).catch(this.onError);
         }
       },
@@ -215,9 +215,9 @@ export class MusicSubscription {
 
     this.audioPlayer.on(
       "error",
-      (error: { resource: any }) =>
+      (err: { resource: any }) =>
         // @ts-ignore
-        this.onError(error),
+        this.onError(err),
     );
 
     voiceConnection.subscribe(this.audioPlayer);

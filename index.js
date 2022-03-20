@@ -1,0 +1,1 @@
+import a from "./built/init.js";

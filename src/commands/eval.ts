@@ -11,8 +11,13 @@ const { commandPropertiesArray, commands, loadCommands } = await import(
   "../commands.js"
 );
 const botConfig = await import("../loadedConfig.js");
-const { RestLoadingApplicationCommands } = await import("../rest.js");
-const lgbt = await import("../pfp_lgbtapi_wrapper.js");
+const {
+  restLoadApplicationCommands,
+  restLoadPublicCommands: restLoadProdCommands,
+  restLoadTestCommands,
+  restDeleteApplicationCommands,
+} = await import("../rest.js");
+const lgbt = await import("../pfpLgbtApiWrapper.js");
 
 class EvalCommand extends AdminSlashCommand {
   constructor() {
@@ -45,8 +50,8 @@ class EvalCommand extends AdminSlashCommand {
 
       // Reply in the channel with our result
       await interaction.followUp(`\`\`\`js\n${cleaned}\n\`\`\``);
-    } catch (error) {
-      cleaned = await clean(error);
+    } catch (err) {
+      cleaned = await clean(err);
       // Reply in the channel with our error
       await interaction.followUp(`\`ERROR\` \`\`\`xl\n${cleaned}\n\`\`\``);
     }

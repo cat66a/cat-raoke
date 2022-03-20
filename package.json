@@ -1,6 +1,10 @@
 {
   "name": "test_bot",
-  "main": "./built/index",
+  "main": "./index",
+  "scripts": {
+    "start": "node index.js",
+    "build": "rm --dir --recursive ./build/ && tsc"
+  },
   "dependencies": {
     "@discordjs/opus": "^0.5.3",
     "@discordjs/rest": "^0.3.0",

@@ -26,7 +26,7 @@ class PlayCommand extends MusicSlashCommand {
           required: true,
         },
       ],
-    }, { global: true });
+    }, { public_: true });
   }
   async execute(
     interaction: CommandInteraction,
@@ -50,10 +50,10 @@ class PlayCommand extends MusicSlashCommand {
       console.log("6");
       await interaction.followUp(`Piste rajoutée : \`${track.data.title}\``);
       console.log("7");
-    } catch (error) {
-      console.warn(error);
+    } catch (err) {
+      console.warn(err);
 
-      if (((error.message) as string).includes("No video id found")) {
+      if (((err.message) as string).includes("No video id found")) {
         await interaction.followUp(
           "Aucune piste trouvée, vous pouvez réessayer avec d'autres mots-clés/un autre lien, ou réessayer plus tard",
         );

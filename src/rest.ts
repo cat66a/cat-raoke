@@ -1,23 +1,61 @@
 import { REST } from "@discordjs/rest";
 import { Routes } from "discord-api-types/v9";
-import { bot_token, guild_ids, main_guild_id } from "./loadedConfig.js";
+import { botToken, mainGuildId, whitelistedGuildIds } from "./loadedConfig.js";
 import { commandPropertiesArray } from "./commands.js";
+import { Snowflake } from "discord.js";
+import { BaseSlashCommand } from "./slashCommand.js";
 
-const rest = new REST({ version: "9" }).setToken(bot_token);
+const rest = new REST({ version: "9" }).setToken(botToken);
+const client_id: string = ((await rest.get("/users/@me")) as any).id;
 
-export async function RestLoadingApplicationCommands() {
+export async function restLoadApplicationCommands(
+  guildIDs: Snowflake[] = [],
+) {
   try {
-    const client_id: string = ((await rest.get("/users/@me")) as any).id;
-
     const commandProperties = commandPropertiesArray();
     const testCommands = commandProperties.filter((commandProps) =>
-      !commandProps.global
+      !commandProps.public_
     );
-    const globalCommands = commandProperties.filter((commandProps) =>
-      commandProps.global
+    const publicCommands = commandProperties.filter((commandProps) =>
+      commandProps.public_
     );
 
+    await restLoadTestCommands(testCommands);
+    await restLoadPublicCommands(publicCommands, guildIDs);
+
     /*
+    await rest.put(
+      Routes.applicationCommands(client_id),
+      { body: publicCommands.map((cmd) => cmd.APIProperties) },
+    );
+    */
+  } catch (err) {
+    console.warn(err);
+  }
+}
+
+export async function restLoadTestCommands(commandProps: BaseSlashCommand[]) {
+  await rest.put(
+    Routes.applicationGuildCommands(client_id, mainGuildId),
+    { body: commandProps.map((cmd) => cmd.properties) },
+  );
+}
+
+export async function restLoadPublicCommands(
+  commandProps: BaseSlashCommand[],
+  guildIDs: Snowflake[],
+) {
+  await Promise.all(guildIDs.map(async (guildID) => {
+    await rest.put(
+      Routes.applicationGuildCommands(client_id, guildID),
+      { body: commandProps.map((cmd) => cmd.properties) },
+    );
+  }));
+}
+
+// 0 = all, 1 = only global cmds, 2 = only guild cmds
+export async function restDeleteApplicationCommands(mode: 0 | 1 | 2) {
+  if (mode === 0 || 1) {
     const getGlobalCommands = await rest.get(
       Routes.applicationCommands(client_id),
     ) as [{ id: string }];
@@ -27,8 +65,10 @@ export async function RestLoadingApplicationCommands() {
         Routes.applicationCommand(client_id, cmd.id),
       );
     }));
+  }
 
-    await Promise.all(guild_ids.map(async (guildId) => {
+  if (mode === 0 || 2) {
+    await Promise.all(whitelistedGuildIds.map(async (guildId) => {
       const getGuildCommands = await rest.get(
         Routes.applicationGuildCommands(client_id, guildId),
       ) as [{ id: string }];
@@ -39,20 +79,5 @@ export async function RestLoadingApplicationCommands() {
         );
       }));
     }));
-
-    console.log("cc");
-    */
-
-    await rest.put(
-      Routes.applicationGuildCommands(client_id, main_guild_id),
-      { body: testCommands.map((cmd) => cmd.APIProperties) },
-    );
-
-    await rest.put(
-      Routes.applicationCommands(client_id),
-      { body: globalCommands.map((cmd) => cmd.APIProperties) },
-    );
-  } catch (error) {
-    console.warn(error);
   }
 }

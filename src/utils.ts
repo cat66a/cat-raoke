@@ -1,7 +1,7 @@
 // This function cleans up and prepares the
 // result of our eval command input for sending
 
-import { bot_token } from "./loadedConfig.js";
+import { botToken } from "./loadedConfig.js";
 
 // to the channel
 export const clean = async (text: any): Promise<string> => {
@@ -22,7 +22,7 @@ export const clean = async (text: any): Promise<string> => {
   text = (text as string)
     .replace(/`/g, "`" + String.fromCharCode(8203))
     .replace(/@/g, "@" + String.fromCharCode(8203))
-    .replaceAll(bot_token, "[CENSORED BOT TOKEN]");
+    .replaceAll(botToken, "[CENSORED BOT TOKEN]");
 
   // Send off the cleaned up result
   return text;

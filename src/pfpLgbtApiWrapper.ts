@@ -80,7 +80,7 @@ export async function getFlagNames(): Promise<string[]> {
  * @param flag The target flag. You can get a list of all flags with the `getFlags()` method
  * @returns `Promise<Buffer>`
  */
-export function getFlag(flag: PrideFlags = "pride") {
+export function getFlag(flag: string = "pride") {
   return _fetch(getFlagUrl(flag), {}, "img");
 }
 
@@ -89,7 +89,7 @@ export function getFlag(flag: PrideFlags = "pride") {
  * @param flag The target flag. You can get a list of all flags with the `getFlags()` method
  * @returns `Promise<Buffer>`
  */
-export function getFlagUrl(flag: PrideFlags = "pride") {
+export function getFlagUrl(flag: string = "pride") {
   return baseUrl + "icon/" + flag;
 }
 
@@ -105,7 +105,7 @@ export function getFlagUrl(flag: PrideFlags = "pride") {
  */
 export async function createStatic(
   image: Buffer | string,
-  flag: PrideFlags,
+  flag: string,
   type: "circle" | "overlay" | "square" | "background" = "circle",
   style: "solid" | "gradient" = "solid",
   format: "jpg" | "png" = "png",
@@ -130,7 +130,7 @@ export async function createStatic(
  */
 export async function createAnimated(
   image: Buffer | string,
-  flag: PrideFlags,
+  flag: string,
   type: "circle" | "square" = "circle",
   alpha?: number,
 ) {
@@ -144,39 +144,6 @@ export async function createAnimated(
   return _fetchImage(url, image, alpha);
 }
 
-export type PrideFlags =
-  | "abrosexual"
-  | "ace"
-  | "agender"
-  | "aromantic"
-  | "bi"
-  | "genderfluid"
-  | "genderqueer"
-  | "intersex"
-  | "lesbian"
-  | "nb"
-  | "pan"
-  | "poc"
-  | "pride"
-  | "trans";
-
-export const prideFlags = [
-  "abrosexual",
-  "ace",
-  "agender",
-  "aromantic",
-  "bi",
-  "genderfluid",
-  "genderqueer",
-  "intersex",
-  "lesbian",
-  "nb",
-  "pan",
-  "poc",
-  "pride",
-  "trans",
-];
-
 type FlagResponse = {
-  [key in PrideFlags]: { defaultAlpha: number; tooltip: string };
+  [key: string]: { defaultAlpha: number; tooltip: string };
 };

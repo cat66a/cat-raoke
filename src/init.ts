@@ -1,24 +1,29 @@
 import { Client, CommandInteraction, Intents } from "discord.js";
 import { commands, loadCommands } from "./commands.js";
-import { bot_token } from "./loadedConfig.js";
-import { RestLoadingApplicationCommands } from "./rest.js";
+import { botToken } from "./loadedConfig.js";
+import { restLoadApplicationCommands } from "./rest.js";
 
 const { FLAGS } = Intents;
-
-const client = new Client({
-  intents: [FLAGS.GUILDS, FLAGS.GUILD_VOICE_STATES, FLAGS.GUILD_MEMBERS],
-});
 
 console.log('Loading commands inside "commands" dir');
 await loadCommands();
 console.log("Commands successfully loaded");
 
-console.log("Started reloading application (/) commands.");
-await RestLoadingApplicationCommands();
-console.log("Successfully reloaded application (/) commands.");
+const client = new Client({
+  intents: [FLAGS.GUILDS, FLAGS.GUILD_VOICE_STATES, FLAGS.GUILD_MEMBERS],
+});
 
-client.on("ready", () => {
-  console.log(`Logged in as ${client.user.tag}`);
+client.on("ready", async () => {
+  console.log(`Ready as ${client.user.tag}`);
+
+  console.log("Started reloading application (/) commands.");
+  try {
+    await client.guilds.fetch();
+    await restLoadApplicationCommands(Array.from(client.guilds.cache.keys()));
+  } catch (err) {
+    console.warn(err);
+  }
+  console.log("Successfully reloaded application (/) commands.");
 });
 
 client.on("interactionCreate", async (interaction) => {
@@ -33,6 +38,7 @@ client.on("interactionCreate", async (interaction) => {
         );
       }
 
+      console.log(commandName);
       const command = commands.get(commandName);
 
       await command.preExec(interaction);
@@ -48,7 +54,13 @@ async function interactionErrorHandler(
   interaction: CommandInteraction,
   error: Error,
 ) {
+  await interaction.followUp(
+    "Une erreur est survenue lors de l'exécution de cette commande :/",
+  );
+
   console.warn(error);
 }
 
-await client.login(bot_token);
+await client.login(botToken);
+
+export default {};
