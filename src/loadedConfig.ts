@@ -6,7 +6,6 @@ if (dotenvResult.error) throw dotenvResult.error;
 
 const config = dotenvResult.parsed;
 
-console.log(config);
 export const botToken: string = config.BOT_TOKEN;
 export const mainGuildId: string = config.MAIN_GUILD_ID;
 export const botOwnerId: string = config.BOT_OWNER_ID;
