@@ -1,8 +1,14 @@
 // @ts-ignore
-import config from "../config.json" assert { type: "json" };
+import { config as loadConfig } from "dotenv";
 
-export const botToken: string = config.bot_token;
-export const mainGuildId: string = config.main_guild_id;
-export const botOwnerId: string = config.bot_owner_id;
+const dotenvResult = loadConfig();
+if (dotenvResult.error) throw dotenvResult.error;
 
-export const googleapisToken: string = config.googleapis_token;
+const config = dotenvResult.parsed;
+
+console.log(config);
+export const botToken: string = config.BOT_TOKEN;
+export const mainGuildId: string = config.MAIN_GUILD_ID;
+export const botOwnerId: string = config.BOT_OWNER_ID;
+
+export const googleapisToken: string = config.GOOGLEAPIS_TOKEN;
