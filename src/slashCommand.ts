@@ -7,7 +7,7 @@ import {
   ApplicationCommandOptionTypes,
   ApplicationCommandTypes,
 } from "discord.js/typings/enums";
-import { botOwnerId, whitelistedGuildIds } from "./loadedConfig.js";
+import { botOwnerId } from "./loadedConfig.js";
 import { MusicSubscription, subscriptions } from "./music/subscription.js";
 
 export interface IApplicationCommandsOptionsData {
@@ -62,12 +62,6 @@ export class BaseSlashCommand implements IOtherProps {
     if (this.admin && interaction.member.user.id !== botOwnerId) {
       return interaction.reply(
         "Cette commande est réservée à la propriétaire du bot, tu ne peux pas l'utiliser",
-      );
-    }
-
-    if (!whitelistedGuildIds.includes(interaction.guildId)) {
-      return interaction.reply(
-        "Ce serveur n'est pas autorisé à utiliser les commandes du bot\nSi cela n'est pas normal/prévu, veuillez contacter la propriétaire du bot",
       );
     }
 

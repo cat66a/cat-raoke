@@ -1,6 +1,6 @@
 import { REST } from "@discordjs/rest";
 import { Routes } from "discord-api-types/v9";
-import { botToken, mainGuildId, whitelistedGuildIds } from "./loadedConfig.js";
+import { botToken, mainGuildId } from "./loadedConfig.js";
 import { commandPropertiesArray } from "./commands.js";
 import { Snowflake } from "discord.js";
 import { BaseSlashCommand } from "./slashCommand.js";
@@ -54,7 +54,10 @@ export async function restLoadPublicCommands(
 }
 
 // 0 = all, 1 = only global cmds, 2 = only guild cmds
-export async function restDeleteApplicationCommands(mode: 0 | 1 | 2) {
+export async function restDeleteApplicationCommands(
+  mode: 0 | 1 | 2,
+  guildIDs?: Snowflake[],
+) {
   if (mode === 0 || 1) {
     const getGlobalCommands = await rest.get(
       Routes.applicationCommands(client_id),
@@ -68,7 +71,7 @@ export async function restDeleteApplicationCommands(mode: 0 | 1 | 2) {
   }
 
   if (mode === 0 || 2) {
-    await Promise.all(whitelistedGuildIds.map(async (guildId) => {
+    await Promise.all(guildIDs.map(async (guildId) => {
       const getGuildCommands = await rest.get(
         Routes.applicationGuildCommands(client_id, guildId),
       ) as [{ id: string }];
