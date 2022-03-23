@@ -104,7 +104,6 @@ export class Track {
     let info: videoInfo;
     let url: string;
 
-    console.log("2");
     try {
       url = query;
       info = await getInfo(url);
@@ -120,7 +119,6 @@ export class Track {
       }
     }
 
-    console.log("3");
     return new Track(
       {
         title: info.videoDetails.title,
