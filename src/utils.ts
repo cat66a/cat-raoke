@@ -27,3 +27,7 @@ export const clean = async (text: any): Promise<string> => {
   // Send off the cleaned up result
   return text;
 };
+
+export type UnknownObject = {
+  [key: string]: any;
+};

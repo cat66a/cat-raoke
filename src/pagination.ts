@@ -7,7 +7,6 @@
  */
 import {
   ButtonInteraction,
-  Client,
   Collection,
   CommandInteraction,
   EmojiIdentifierResolvable,
@@ -16,18 +15,28 @@ import {
   MessageActionRow,
   MessageButton,
   MessageButtonStyleResolvable,
+  MessageComponentInteraction,
   MessageEmbed,
   Snowflake,
   TextChannel,
 } from "discord.js";
 
-/** Pagination class */
-export class Pagination {
-  /**
-   * The discord.js Client
-   * @type {Client}
-   */
+/*
+const interactionPolyfill = (message: Message) => {
+  return {
+    update: async (
+      options: ButtonInteraction["update"],
+    ): Promise<void> => {
+      // @ts-ignore
+      return message.edit(options);
+    },
+  };
+};
+*/
 
+/** Pagination class */
+
+export class Pagination {
   /**
    * Pagination Options
    * @type {PaginationOptions}
@@ -45,7 +54,7 @@ export class Pagination {
       },
       page: "Page {{page}} / {{total_pages}}",
     },
-    timeout: 30000, //30 seconds
+    timeout: 300000, // 5 minutes
   };
 
   /**
@@ -85,7 +94,10 @@ export class Pagination {
    */
   public authorizedUsers: Array<Snowflake>;
 
-  constructor(options: PaginationOptions) {
+  public updatePagesCB?: (pages?: this["pages"]) => this["pages"];
+  public transformPageCB?: (page: MessageEmbed) => MessageEmbed;
+
+  constructor(options?: PaginationOptions) {
     if (options && options.buttons) {
       options.buttons = Object.assign(
         this.options.buttons,
@@ -129,30 +141,50 @@ export class Pagination {
   /**
    * Set Array of pages to paginate
    * @param array - Those pages
-   * @return {boolen}
+   * @return {boolean}
    */
-  public setPages(array: Array<MessageEmbed>) {
+  public setPages(array: Array<MessageEmbed>): Pagination {
     this.pages = array;
-    return true;
+    return this;
   }
 
   /**
    * Set an array of user IDs who can switch pages
    * @param users - A array of user IDs
-   * @return {boolen}
+   * @return {boolean}
    */
-  public setAuthorizedUsers(users: Array<Snowflake>) {
+  public setAuthorizedUsers(users: Array<Snowflake>): Pagination {
     this.authorizedUsers = users;
-    return true;
+    return this;
+  }
+
+  public setUpdatePagesCB(callback: this["updatePagesCB"]): Pagination {
+    this.updatePagesCB = callback;
+    return this;
+  }
+
+  public setTransformPageCB(callback: this["transformPageCB"]): Pagination {
+    this.transformPageCB = callback;
+    return this;
+  }
+
+  public updatePages() {
+    this.updatePagesCB ? this.setPages(this.updatePagesCB()) : void 0;
+  }
+
+  public getPage() {
+    const page = this.pages[this.page];
+
+    return this.transformPageCB ? this.transformPageCB(page) : page;
   }
 
   /**
    * Send the embed
    * @param channel - If you want to send it to a channel instead of repling to interaction, give the channel here
    * @param interaction - If you are not providing channel, set channel to false and provide a command interaction here
-   * @return {boolen}
+   * @return {boolean}
    */
-  public async send(channel: TextChannel, i: CommandInteraction) {
+  public async send(i: CommandInteraction, channel?: TextChannel) {
     if (!this.pages) throw new Error("Pages not set");
     if (!this.authorizedUsers) throw new Error("Authorized Users not set");
     if (!channel && !(i && i?.isCommand?.())) {
@@ -179,30 +211,32 @@ export class Pagination {
       .setCustomId(`next-${this._key}`);
     if (buttons.next.emoji) nextButton.setEmoji(buttons.next.emoji);
     this._actionRow.addComponents(backButton, pageButton, nextButton);
-    let msg;
+    let sentMessage: Message;
     if (channel) {
-      msg = await channel.send({
-        embeds: [this.pages[this.page]],
+      sentMessage = await channel.send({
+        embeds: [this.getPage()],
         components: [this._actionRow],
       });
     } else if (i) {
-      msg = await i.followUp({
-        embeds: [this.pages[this.page]],
+      sentMessage = await i.followUp({
+        embeds: [this.getPage()],
         components: [this._actionRow],
-      });
+      }) as Message;
     } else {
       return false;
     }
-    msg = msg as Message;
+    sentMessage = sentMessage as Message;
+
     const ids = [`next-${this._key}`, `back-${this._key}`];
     const filter = ((i: any) =>
       ids.includes(i.customId) &&
       this.authorizedUsers.includes(i.user.id)).bind(this);
-    const collector = msg.createMessageComponentCollector({
+    const collector = sentMessage.createMessageComponentCollector({
       filter,
       componentType: "BUTTON",
       time: this.options.timeout,
     });
+
     collector.on("collect", (interaction: ButtonInteraction) => {
       const handlePage = (() => {
         if (this._actionRow.components[1] instanceof MessageButton) {
@@ -211,23 +245,28 @@ export class Pagination {
           );
         }
       }).bind(this); //Update page label
+
+      this.updatePages();
+
       switch (interaction.customId) {
         case `next-${this._key}`:
-          this.page = this.page + 1 < this.pages.length ? ++this.page : 0;
+          this.page = this.page + 1 < this.pages.length
+            ? ++this.page
+            : this.pages.length - 1;
           handlePage();
           interaction
             .update({
-              embeds: [this.pages[this.page]],
+              embeds: [this.getPage()],
               components: [this._actionRow],
             })
             .catch(() => true);
           break;
         case `back-${this._key}`:
-          this.page = this.page > 0 ? --this.page : this.pages.length - 1;
+          this.page = this.page > 0 ? --this.page : 0;
           handlePage();
           interaction
             .update({
-              embeds: [this.pages[this.page]],
+              embeds: [this.getPage()],
               components: [this._actionRow],
             })
             .catch(() => true);
@@ -237,12 +276,29 @@ export class Pagination {
     collector.on(
       "end",
       async (collected: Collection<Snowflake, Interaction>) => {
-        const interaction = collected.last() as ButtonInteraction;
+        // const interaction = collected.last() as ButtonInteraction ||
+        //  interactionPolyfill(msg);
+
+        /* 
         for (let i = 0; i < this._actionRow.components.length; i++) {
           this._actionRow.components[i].setDisabled(true);
         }
+        */
+
+        this._actionRow.components.forEach((component) => component.setDisabled(true));
+
+        /*
         await interaction
+          // @ts-ignore
           .update({
+            embeds: [this.pages[this.page]],
+            components: [this._actionRow],
+          })
+          .catch(() => true);
+        */
+
+        await sentMessage
+          .edit({
             embeds: [this.pages[this.page]],
             components: [this._actionRow],
           })

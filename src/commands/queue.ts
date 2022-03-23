@@ -1,10 +1,58 @@
 import { AudioPlayerStatus, AudioResource } from "@discordjs/voice";
-import { CommandInteraction } from "discord.js";
+import { CommandInteraction, MessageEmbed } from "discord.js";
 import { MusicSubscription } from "../music/subscription.js";
 import { Track } from "../music/track.js";
+import { Pagination } from "../pagination.js";
 import { MusicSlashCommand } from "../slashCommand.js";
 
-const titleMaxLength = 45;
+const titleMaxLength = 50;
+const pageSize = 10;
+
+export function makePages(queue: Track[]): MessageEmbed[] {
+  const copiedQueue = Array.from(queue);
+  const pages: Array<MessageEmbed> = [];
+
+  if (copiedQueue.length === 0) {
+    const page = new MessageEmbed({
+      fields: [{ name: "** **", value: "**La file d'attente est ✨ vide ✨**" }],
+    });
+
+    pages.push(page);
+
+    return pages;
+  }
+
+  let indexQueue = 0;
+  let oldIndexQueue = 0;
+
+  while (indexQueue < (copiedQueue.length)) {
+    indexQueue = indexQueue + pageSize;
+    const elements = copiedQueue.slice(
+      indexQueue - pageSize < 0 ? 0 : indexQueue - pageSize,
+      indexQueue,
+    );
+
+    const formattedQueue = elements.map(({ data }, index) => {
+      let title: string;
+      data.title.length > titleMaxLength
+        ? title = data.title.slice(0, titleMaxLength) + "..."
+        : title = data.title;
+
+      return `**${index + oldIndexQueue + 1}** • \`${title}\``;
+    })
+      .join("\n");
+
+    const page = new MessageEmbed({
+      fields: [{ name: "** **", value: formattedQueue }],
+    });
+
+    pages.push(page);
+
+    oldIndexQueue = indexQueue;
+  }
+
+  return pages;
+}
 
 class QueueCommand extends MusicSlashCommand {
   constructor() {
@@ -16,33 +64,34 @@ class QueueCommand extends MusicSlashCommand {
     interaction: CommandInteraction,
     subscription: void | MusicSubscription,
   ): Promise<void> {
-    if (subscription) {
-      const current =
-        subscription.audioPlayer.state.status === AudioPlayerStatus.Idle
-          ? "Rien n'est actuellement en cours de lecture"
-          : `En cours de lecture : \`${
-            (subscription.audioPlayer.state.resource as AudioResource<Track>)
-              .metadata.data.title
-          }\``;
-
-      const queue = subscription.queue
-        .slice(0, 7)
-        .map(({ data }, index) => {
-          let title: string;
-          data.title.length > titleMaxLength
-            ? title = data.title.slice(0, titleMaxLength) + "..."
-            : title = data.title;
-
-          return `**${index + 1}** • \`${title}\``;
-        })
-        .join("\n");
-
-      await interaction.reply(`${current}\n\n${queue}`);
-    } else {
-      await interaction.reply(
+    if (!subscription) {
+      return await interaction.reply(
         "Je ne suis pas en train de jouer de la musique sur ce serveur !",
       );
     }
+
+    const curryMakePages = () => makePages(subscription.queue);
+
+    const pagination = new Pagination();
+
+    pagination.setAuthorizedUsers([interaction.user.id])
+      .setPages(curryMakePages())
+      .setUpdatePagesCB(curryMakePages)
+      .setTransformPageCB((page) => {
+        const current =
+          subscription.audioPlayer.state.status === AudioPlayerStatus.Idle
+            ? "**Rien n'est actuellement en cours de lecture**"
+            : `**En cours de lecture** : \`${
+              (subscription.audioPlayer.state.resource as AudioResource<Track>)
+                .metadata.data.title
+            }\``;
+
+        return page.setDescription(current).setTitle(
+          "File d'attente pour ce serveur",
+        );
+      });
+
+    await pagination.send(interaction);
   }
 }
 
