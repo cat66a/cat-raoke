@@ -106,6 +106,6 @@ export class AdminSlashCommand extends BaseSlashCommand {
   constructor(
     APIProperties: Omit<IApplicationCommandProperties, "type">,
   ) {
-    super(APIProperties, { admin: true, public_: true });
+    super(APIProperties, { admin: true, public_: false });
   }
 }
