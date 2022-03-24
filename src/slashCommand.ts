@@ -1,13 +1,9 @@
-import {
-  APIApplicationCommandPermission,
-  ChannelType,
-} from "discord-api-types/v9";
-import { CommandInteraction } from "discord.js";
+import { ChannelType } from "discord-api-types/v9";
+import { CommandInteraction, Team, User } from "discord.js";
 import {
   ApplicationCommandOptionTypes,
   ApplicationCommandTypes,
 } from "discord.js/typings/enums";
-import { botOwnerId } from "./loadedConfig.js";
 import { MusicSubscription, subscriptions } from "./music/subscription.js";
 
 export interface IApplicationCommandsOptionsData {
@@ -36,33 +32,39 @@ export interface IOtherProps {
 }
 export class BaseSlashCommand implements IOtherProps {
   public readonly properties: IApplicationCommandProperties;
-  public readonly permissions: APIApplicationCommandPermission[];
   public readonly admin: boolean;
   public readonly public_: boolean;
 
   constructor(
     APIProperties: Omit<IApplicationCommandProperties, "type">,
     { admin, public_ }: IOtherProps,
-    permissions?: APIApplicationCommandPermission[],
   ) {
     this.properties = APIProperties as IApplicationCommandProperties;
     this.properties.type = 1;
 
     this.admin = admin;
     this.public_ = public_;
-
-    this.permissions = permissions || [];
-
-    if (admin) {
-      this.permissions.push({ id: botOwnerId, type: 2, permission: true });
-    }
   }
 
-  preExec(interaction: CommandInteraction): Promise<void> {
-    if (this.admin && interaction.member.user.id !== botOwnerId) {
-      return interaction.reply(
-        "Cette commande est réservée à la propriétaire du bot, tu ne peux pas l'utiliser",
-      );
+  async preExec(interaction: CommandInteraction): Promise<void> {
+    if (this.admin) {
+      let pass: boolean = false;
+
+      const application = await interaction.client.application.fetch();
+      const botOwner = application.owner;
+      const user = interaction.user;
+
+      if (botOwner instanceof Team) {
+        if ((botOwner as Team).owner.id === user.id) pass = true;
+      } else if (botOwner instanceof User) {
+        if (botOwner.id === user.id) pass = true;
+      }
+
+      if (!pass) {
+        return interaction.reply(
+          "Cette commande est réservée au/à la propriétaire du bot, tu ne peux pas l'utiliser",
+        );
+      }
     }
 
     return this.prepare(interaction);
@@ -81,9 +83,8 @@ export class MusicSlashCommand extends BaseSlashCommand {
   constructor(
     APIProperties: Omit<IApplicationCommandProperties, "type">,
     otherProps?: IOtherProps,
-    permissions?: APIApplicationCommandPermission[],
   ) {
-    super(APIProperties, otherProps, permissions);
+    super(APIProperties, otherProps);
   }
 
   prepare(interaction: CommandInteraction): Promise<void> {
@@ -104,8 +105,7 @@ export class MusicSlashCommand extends BaseSlashCommand {
 export class AdminSlashCommand extends BaseSlashCommand {
   constructor(
     APIProperties: Omit<IApplicationCommandProperties, "type">,
-    permissions?: APIApplicationCommandPermission[],
   ) {
-    super(APIProperties, { admin: true, public_: true }, permissions);
+    super(APIProperties, { admin: true, public_: true });
   }
 }

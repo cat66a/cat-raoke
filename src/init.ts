@@ -58,6 +58,7 @@ async function interactionErrorHandler(
   interaction: CommandInteraction,
   error: Error,
 ) {
+  if (!interaction.deferred) await interaction.deferReply();
   await interaction.followUp(
     "Une erreur est survenue lors de l'exécution de cette commande :/",
   );

@@ -30,7 +30,6 @@ class EvalCommand extends AdminSlashCommand {
         type: 3,
         required: true,
       }],
-      default_permission: true,
     });
   }
   async execute(interaction: CommandInteraction): Promise<void> {

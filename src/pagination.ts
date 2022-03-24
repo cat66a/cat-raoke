@@ -279,13 +279,15 @@ export class Pagination {
         // const interaction = collected.last() as ButtonInteraction ||
         //  interactionPolyfill(msg);
 
-        /* 
+        /*
         for (let i = 0; i < this._actionRow.components.length; i++) {
           this._actionRow.components[i].setDisabled(true);
         }
         */
 
-        this._actionRow.components.forEach((component) => component.setDisabled(true));
+        this._actionRow.components.forEach((component) =>
+          component.setDisabled(true)
+        );
 
         /*
         await interaction
