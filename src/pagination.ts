@@ -21,19 +21,6 @@ import {
   TextChannel,
 } from "discord.js";
 
-/*
-const interactionPolyfill = (message: Message) => {
-  return {
-    update: async (
-      options: ButtonInteraction["update"],
-    ): Promise<void> => {
-      // @ts-ignore
-      return message.edit(options);
-    },
-  };
-};
-*/
-
 /** Pagination class */
 
 export class Pagination {
@@ -276,28 +263,9 @@ export class Pagination {
     collector.on(
       "end",
       async (collected: Collection<Snowflake, Interaction>) => {
-        // const interaction = collected.last() as ButtonInteraction ||
-        //  interactionPolyfill(msg);
-
-        /*
-        for (let i = 0; i < this._actionRow.components.length; i++) {
-          this._actionRow.components[i].setDisabled(true);
-        }
-        */
-
         this._actionRow.components.forEach((component) =>
           component.setDisabled(true)
         );
-
-        /*
-        await interaction
-          // @ts-ignore
-          .update({
-            embeds: [this.pages[this.page]],
-            components: [this._actionRow],
-          })
-          .catch(() => true);
-        */
 
         await sentMessage
           .edit({
