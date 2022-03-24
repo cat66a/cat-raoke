@@ -1,13 +1,7 @@
-import {
-  entersState,
-  joinVoiceChannel,
-  VoiceConnectionStatus,
-} from "@discordjs/voice";
-import { CommandInteraction, GuildMember } from "discord.js";
+import { CommandInteraction } from "discord.js";
 import {
   joinVCAndCreateSubscription,
   MusicSubscription,
-  subscriptions,
 } from "../music/subscription.js";
 import { Track } from "../music/track.js";
 import { MusicSlashCommand } from "../slashCommand.js";
@@ -41,9 +35,11 @@ class PlayCommand extends MusicSlashCommand {
 
     try {
       const track = await Track.from(query);
-
       subscription.enqueue(track);
-      await interaction.followUp(`Piste rajoutée : \`${track.data.title}\``);
+
+      await interaction.followUp(
+        `Piste rajoutée : \`${track.data.title}\` (${track.data.length})`,
+      );
     } catch (err) {
       console.warn(err);
 

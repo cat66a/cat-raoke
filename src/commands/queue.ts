@@ -38,7 +38,7 @@ export function makePages(queue: Track[]): MessageEmbed[] {
         ? title = data.title.slice(0, titleMaxLength) + "..."
         : title = data.title;
 
-      return `**${index + oldIndexQueue + 1}** • \`${title}\``;
+      return `**${index + oldIndexQueue + 1}** • \`${title}\` (${data.length})`;
     })
       .join("\n");
 
@@ -78,13 +78,17 @@ class QueueCommand extends MusicSlashCommand {
       .setPages(curryMakePages())
       .setUpdatePagesCB(curryMakePages)
       .setTransformPageCB((page) => {
-        const current =
-          subscription.audioPlayer.state.status === AudioPlayerStatus.Idle
-            ? "**Rien n'est actuellement en cours de lecture**"
-            : `**En cours de lecture** : \`${
-              (subscription.audioPlayer.state.resource as AudioResource<Track>)
-                .metadata.data.title
-            }\``;
+        let current: string;
+        if (subscription.audioPlayer.state.status === AudioPlayerStatus.Idle) {
+          current = "**Rien n'est actuellement en cours de lecture**";
+        } else {
+          const currentTrackData =
+            (subscription.audioPlayer.state.resource as AudioResource<Track>)
+              .metadata.data;
+
+          current =
+            `**En cours de lecture** : \`${currentTrackData.title}\` (${currentTrackData.length})`;
+        }
 
         return page.setDescription(current).setTitle(
           "File d'attente pour ce serveur",

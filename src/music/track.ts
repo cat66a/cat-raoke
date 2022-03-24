@@ -1,3 +1,5 @@
+// Based on https://github.com/discordjs/voice/tree/main/examples/music-bot
+
 import { videoInfo } from "ytdl-core";
 import {
   AudioResource,
@@ -11,6 +13,7 @@ import pkg from "youtube-dl-exec";
 const { raw: ytdl } = pkg;
 
 import ytdl_core from "ytdl-core";
+import { ConvertedSeconds, convertSeconds } from "../convertSeconds.js";
 const { getInfo } = ytdl_core;
 
 /**
@@ -19,6 +22,7 @@ const { getInfo } = ytdl_core;
 export interface TrackData {
   url: string;
   title: string;
+  length: string;
 }
 
 export interface TrackEvents {
@@ -29,6 +33,16 @@ export interface TrackEvents {
 
 // eslint-disable-next-line @typescript-eslint/no-empty-function
 const noop = () => {};
+
+export function formatTrackLength(length: ConvertedSeconds): string {
+  const hours = length.hours ? `${length.hours}:` : "";
+  const minutes = `${
+    (length.minutes < 10 && length.hours) ? "0" : ""
+  }${length.minutes}`;
+  const seconds = `${length.seconds < 10 ? "0" : ""}${length.seconds}`;
+
+  return `${hours}${minutes}:${seconds}`;
+}
 
 /**
  * A Track represents information about a YouTube video (in this context) that can be added to a queue.
@@ -118,11 +132,16 @@ export class Track {
         throw err;
       }
     }
+    const parsedTrackLength = parseInt(info.videoDetails.lengthSeconds, 10);
+    const formattedTrackLength = formatTrackLength(
+      convertSeconds(parsedTrackLength),
+    );
 
     return new Track(
       {
         title: info.videoDetails.title,
         url,
+        length: formattedTrackLength,
       },
     );
   }
