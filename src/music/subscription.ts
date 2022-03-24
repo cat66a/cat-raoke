@@ -1,3 +1,5 @@
+// Based on https://github.com/discordjs/voice/tree/main/examples/music-bot
+
 import {
   AudioPlayer,
   AudioPlayerState,

@@ -1,4 +1,4 @@
-// based on https://github.com/InfusionBot/discord-pagination/
+// based on https://github.com/InfusionBot/discord-pagination/, license: https://github.com/InfusionBot/discord-pagination/blob/main/LICENSE
 
 /**
  * Main Pagination file

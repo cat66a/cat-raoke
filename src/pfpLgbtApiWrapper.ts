@@ -1,4 +1,4 @@
-// based on https://github.com/Vendicated/pfp.lgbt-wrapper
+// based on https://github.com/Vendicated/pfp.lgbt-wrapper, license: https://github.com/Vendicated/pfp.lgbt-wrapper/blob/master/LICENSE
 
 import FormData from "form-data";
 import fetch, { RequestInfo, RequestInit } from "node-fetch";
