@@ -12,13 +12,17 @@ export async function loadCommands() {
   await Promise.all(files.map(async (fileName) => {
     if (fileName.endsWith(".js.map")) return;
 
-    const command: BaseSlashCommand =
-      (await import(`./commands/${fileName}`)).command;
+    try {
+      const command: BaseSlashCommand =
+        (await import(`./commands/${fileName}`)).command;
 
-    // In case the file name and the object's properties.name property don't match
-    let commandName = command.properties.name;
+      // In case the file name and the object's properties.name property don't match
+      let commandName = command.properties.name;
 
-    commands.set(commandName, command);
+      commands.set(commandName, command);
+    } catch (err) {
+      console.warn(err);
+    }
   }));
 
   console.log(Array.from(commands.keys()).join(" - "));

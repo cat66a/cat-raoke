@@ -8,9 +8,7 @@ import { BaseSlashCommand } from "./slashCommand.js";
 const rest = new REST({ version: "9" }).setToken(botToken);
 const client_id: string = ((await rest.get("/users/@me")) as any).id;
 
-export async function restLoadApplicationCommands(
-  guildIDs: Snowflake[] = [],
-) {
+export async function restLoadApplicationCommands() {
   try {
     const commandProperties = commandPropertiesArray();
     const testCommands = commandProperties.filter((commandProps) =>
@@ -20,21 +18,16 @@ export async function restLoadApplicationCommands(
       commandProps.public_
     );
 
-    await restLoadTestCommands(testCommands);
-    await restLoadPublicCommands(publicCommands, guildIDs);
-
-    /*
-    await rest.put(
-      Routes.applicationCommands(client_id),
-      { body: publicCommands.map((cmd) => cmd.APIProperties) },
-    );
-    */
+    await restLoadPrivateCommands(testCommands);
+    await restLoadPublicCommands(publicCommands);
   } catch (err) {
     console.warn(err);
   }
 }
 
-export async function restLoadTestCommands(commandProps: BaseSlashCommand[]) {
+export async function restLoadPrivateCommands(
+  commandProps: BaseSlashCommand[],
+) {
   await rest.put(
     Routes.applicationGuildCommands(client_id, mainGuildId),
     { body: commandProps.map((cmd) => cmd.properties) },
@@ -43,14 +36,11 @@ export async function restLoadTestCommands(commandProps: BaseSlashCommand[]) {
 
 export async function restLoadPublicCommands(
   commandProps: BaseSlashCommand[],
-  guildIDs: Snowflake[],
 ) {
-  await Promise.all(guildIDs.map(async (guildID) => {
-    await rest.put(
-      Routes.applicationGuildCommands(client_id, guildID),
-      { body: commandProps.map((cmd) => cmd.properties) },
-    );
-  }));
+  await rest.put(
+    Routes.applicationCommands(client_id),
+    { body: commandProps.map((cmd) => cmd.properties) },
+  );
 }
 
 // 0 = all, 1 = only global cmds, 2 = only guild cmds

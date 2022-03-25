@@ -13,8 +13,8 @@ const { commandPropertiesArray, commands, loadCommands } = await import(
 const botConfig = await import("../loadedConfig.js");
 const {
   restLoadApplicationCommands,
-  restLoadPublicCommands: restLoadProdCommands,
-  restLoadTestCommands,
+  restLoadPublicCommands,
+  restLoadPrivateCommands,
   restDeleteApplicationCommands,
 } = await import("../rest.js");
 const lgbt = await import("../pfpLgbtApiWrapper.js");

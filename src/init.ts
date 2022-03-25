@@ -10,21 +10,16 @@ export async function init() {
   await loadCommands();
   console.log("Commands successfully loaded");
 
+  console.log("Started reloading application (/) commands.");
+  await restLoadApplicationCommands();
+  console.log("Successfully reloaded application (/) commands.");
+
   const client = new Client({
     intents: [FLAGS.GUILDS, FLAGS.GUILD_VOICE_STATES, FLAGS.GUILD_MEMBERS],
   });
 
   client.on("ready", async () => {
     console.log(`Ready as ${client.user.tag}`);
-
-    console.log("Started reloading application (/) commands.");
-    try {
-      await client.guilds.fetch();
-      await restLoadApplicationCommands(Array.from(client.guilds.cache.keys()));
-    } catch (err) {
-      console.warn(err);
-    }
-    console.log("Successfully reloaded application (/) commands.");
   });
 
   client.on("interactionCreate", async (interaction) => {
@@ -52,6 +47,7 @@ export async function init() {
   });
 
   await client.login(botToken);
+  console.log("Bot successfully login");
 }
 
 async function interactionErrorHandler(
