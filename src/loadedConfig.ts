@@ -1,8 +1,13 @@
 // @ts-ignore
 import { config as loadConfig } from "dotenv";
 
-const dotenvResult = loadConfig();
-if (dotenvResult.error) console.log(dotenvResult.error);
+try {
+  const dotenvResult = loadConfig();
+
+  if (dotenvResult.error) console.log(dotenvResult.error);
+} catch (err) {
+  console.warn(err);
+}
 
 const botToken: string = process.env.BOT_TOKEN;
 const mainGuildId: string = process.env.MAIN_GUILD_ID;
