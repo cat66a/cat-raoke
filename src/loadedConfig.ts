@@ -4,9 +4,13 @@ import { config as loadConfig } from "dotenv";
 const dotenvResult = loadConfig();
 if (dotenvResult.error) throw dotenvResult.error;
 
-const config = dotenvResult.parsed;
+const botToken: string = process.env.BOT_TOKEN;
+const mainGuildId: string = process.env.MAIN_GUILD_ID;
 
-export const botToken: string = config.BOT_TOKEN;
-export const mainGuildId: string = config.MAIN_GUILD_ID;
+const googleapisToken: string = process.env.GOOGLEAPIS_TOKEN;
 
-export const googleapisToken: string = config.GOOGLEAPIS_TOKEN;
+if (!botToken || !mainGuildId || !googleapisToken) {
+  throw "An environment variable is missing";
+}
+
+export { botToken, googleapisToken, mainGuildId };
