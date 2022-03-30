@@ -203,6 +203,12 @@ export class MusicSubscription {
           // If the Idle state is entered from a non-Idle state, it means that an audio resource has finished playing.
           // The queue is then processed to start playing the next track, if one is available.
 
+          if (this.queue.length === 0) {
+            this.textChannel.then((channel) =>
+              channel.send("La queue est vide, aucune piste n'est jouée.")
+            ).catch(this.onError);
+            return;
+          }
           void this.processQueue();
         } else if (newState.status === AudioPlayerStatus.Playing) {
           const songTitle =
@@ -263,8 +269,7 @@ export class MusicSubscription {
     // If the queue is locked (already being processed), is empty, or the audio player is already playing something, return
     if (
       this.queueLock ||
-      this.audioPlayer.state.status !== AudioPlayerStatus.Idle ||
-      this.queue.length === 0
+      this.audioPlayer.state.status !== AudioPlayerStatus.Idle
     ) {
       return;
     }
