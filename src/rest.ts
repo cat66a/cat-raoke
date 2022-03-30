@@ -1,6 +1,6 @@
 import { REST } from "@discordjs/rest";
 import { Routes } from "discord-api-types/v9";
-import { botToken, debugMode, mainGuildId } from "./loadedConfig.js";
+import { botToken, debugMode, mainGuildID } from "./loadedConfig.js";
 import { commandPropertiesArray } from "./commands.js";
 import { Snowflake } from "discord.js";
 import { BaseSlashCommand } from "./slashCommand.js";
@@ -29,7 +29,7 @@ export async function restLoadPrivateCommands(
   commandProps: BaseSlashCommand[],
 ) {
   await rest.put(
-    Routes.applicationGuildCommands(client_id, mainGuildId),
+    Routes.applicationGuildCommands(client_id, mainGuildID),
     { body: commandProps.map((cmd) => cmd.properties) },
   );
 }

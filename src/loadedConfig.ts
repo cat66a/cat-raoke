@@ -11,12 +11,12 @@ try {
 }
 
 const botToken: string = process.env.BOT_TOKEN;
-const mainGuildId: Snowflake = process.env.MAIN_GUILD_ID;
+const mainGuildID: Snowflake = process.env.MAIN_GUILD_ID;
 const googleapisToken: string = process.env.GOOGLEAPIS_TOKEN;
 
 let debugMode: boolean = process.env.DEBUG_MODE === "true";
 
-if (!botToken || !mainGuildId || !googleapisToken) {
+if (!botToken || !mainGuildID || !googleapisToken) {
   throw "An environment variable is missing";
 }
 
@@ -25,4 +25,4 @@ export function setDebugMode(on: boolean) {
   debugMode = on;
 }
 
-export { botToken, debugMode, googleapisToken, mainGuildId };
+export { botToken, debugMode, googleapisToken, mainGuildID };
