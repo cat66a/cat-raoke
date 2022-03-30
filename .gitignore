@@ -4,3 +4,4 @@ built/
 .vscode/settings.json
 config.json
 .env
+test.js

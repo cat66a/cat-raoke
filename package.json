@@ -3,6 +3,7 @@
   "main": "./index",
   "scripts": {
     "start": "node index.js",
+    "startdebug": "node index.js -D",
     "build": "tsc"
   },
   "engines": {

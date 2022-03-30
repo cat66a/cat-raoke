@@ -1,11 +1,15 @@
 import { Client, CommandInteraction, Intents } from "discord.js";
 import { commands, loadCommands } from "./commands.js";
-import { botToken } from "./loadedConfig.js";
+import { botToken, debugMode } from "./loadedConfig.js";
 import { restLoadApplicationCommands } from "./rest.js";
 
 const { FLAGS } = Intents;
 
 export async function init() {
+  if (debugMode) {
+    console.log("Bot launched in debug mode");
+  }
+
   console.log('Loading commands inside "commands" dir');
   await loadCommands();
   console.log("Commands successfully loaded");
