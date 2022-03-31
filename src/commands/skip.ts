@@ -9,7 +9,7 @@ class SkipCommand extends MusicSlashCommand {
       description: "Permet de passer une piste et lancer la prochaine",
     }, { public_: true });
   }
-  async execute(
+  override async execute(
     interaction: CommandInteraction,
     subscription: MusicSubscription,
   ): Promise<void> {

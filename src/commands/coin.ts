@@ -5,7 +5,7 @@ class CoinCommand extends BaseSlashCommand {
   constructor() {
     super({ name: "coin", description: "Coin 🦆 🦆 🦆" }, { public_: true });
   }
-  async execute(interaction: CommandInteraction): Promise<void> {
+  override async execute(interaction: CommandInteraction): Promise<void> {
     return interaction.reply("Coin 🦆 🦆 🦆");
   }
 }

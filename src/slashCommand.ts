@@ -1,5 +1,11 @@
 import { ChannelType } from "discord-api-types/v9";
-import { CommandInteraction, Team, User } from "discord.js";
+import {
+  ClientApplication,
+  CommandInteraction,
+  Snowflake,
+  Team,
+  User,
+} from "discord.js";
 import {
   ApplicationCommandOptionTypes,
   ApplicationCommandTypes,
@@ -37,25 +43,26 @@ export class BaseSlashCommand implements IOtherProps {
 
   constructor(
     APIProperties: Omit<IApplicationCommandProperties, "type">,
-    { admin, public_ }: IOtherProps,
+    otherProps?: IOtherProps,
   ) {
     this.properties = APIProperties as IApplicationCommandProperties;
     this.properties.type = 1;
 
-    this.admin = admin;
-    this.public_ = public_;
+    this.admin = otherProps?.admin ?? false;
+    this.public_ = otherProps?.public_ ?? false;
   }
 
   async preExec(interaction: CommandInteraction): Promise<void> {
     if (this.admin) {
       let pass: boolean = false;
 
-      const application = await interaction.client.application.fetch();
+      const application =
+        await (interaction.client.application as ClientApplication).fetch();
       const botOwner = application.owner;
       const user = interaction.user;
 
       if (botOwner instanceof Team) {
-        if ((botOwner as Team).owner.id === user.id) pass = true;
+        if ((botOwner as Team).owner?.id === user.id) pass = true;
       } else if (botOwner instanceof User) {
         if (botOwner.id === user.id) pass = true;
       }
@@ -74,7 +81,7 @@ export class BaseSlashCommand implements IOtherProps {
     return this.execute(interaction);
   }
 
-  execute(interaction: CommandInteraction): Promise<void> {
+  execute(_interaction: CommandInteraction): Promise<void> {
     throw new Error("Method not implemented.");
   }
 }
@@ -87,16 +94,16 @@ export class MusicSlashCommand extends BaseSlashCommand {
     super(APIProperties, otherProps);
   }
 
-  prepare(interaction: CommandInteraction): Promise<void> {
-    let subscription = subscriptions.get(interaction.guildId);
+  override prepare(interaction: CommandInteraction): Promise<void> {
+    let subscription = subscriptions.get(interaction.guildId as Snowflake);
 
-    return this.execute(interaction, subscription);
+    return this.execute(interaction, subscription as MusicSubscription);
   }
 
   // @ts-ignore
   execute(
-    interaction: CommandInteraction,
-    subscription: MusicSubscription,
+    _interaction: CommandInteraction,
+    _subscription: MusicSubscription,
   ): Promise<void> {
     throw new Error("Method not implemented.");
   }

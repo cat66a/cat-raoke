@@ -10,9 +10,9 @@ try {
   console.warn(err);
 }
 
-const botToken: string = process.env.BOT_TOKEN;
-const mainGuildID: Snowflake = process.env.MAIN_GUILD_ID;
-const googleapisToken: string = process.env.GOOGLEAPIS_TOKEN;
+const botToken = process.env.BOT_TOKEN as string;
+const mainGuildID = process.env.MAIN_GUILD_ID as Snowflake;
+const googleapisToken = process.env.GOOGLEAPIS_TOKEN as string;
 
 let debugMode: boolean = process.env.DEBUG_MODE === "true";
 

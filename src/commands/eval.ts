@@ -32,7 +32,7 @@ class EvalCommand extends AdminSlashCommand {
       }],
     });
   }
-  async execute(interaction: CommandInteraction): Promise<void> {
+  override async execute(interaction: CommandInteraction): Promise<void> {
     await interaction.deferReply();
     // In case something fails, we to catch errors
     // in a try/catch block
@@ -41,7 +41,7 @@ class EvalCommand extends AdminSlashCommand {
 
     try {
       // Evaluate (execute) our input
-      const evaled = eval((interaction.options.get("code").value) as string);
+      const evaled = eval((interaction.options.get("code")?.value) as string);
 
       // Put our eval result through the function
       // we defined above

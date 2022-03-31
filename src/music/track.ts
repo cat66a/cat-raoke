@@ -14,6 +14,7 @@ const { raw: ytdl } = pkg;
 
 import ytdl_core from "ytdl-core";
 import { ConvertedSeconds, convertSeconds } from "../convertSeconds.js";
+import { youtube_v3 } from "googleapis";
 const { getInfo } = ytdl_core;
 
 /**
@@ -122,9 +123,11 @@ export class Track {
       url = query;
       info = await getInfo(url);
     } catch (err) {
-      if (((err.message) as string).includes("No video id found")) {
+      if ((((err as Error).message) as string).includes("No video id found")) {
         const searchResults = await searchVideos(query, 1);
-        const videoId = searchResults.items[0].id.videoId;
+        const videoId =
+          (searchResults.items as youtube_v3.Schema$SearchResult[])[0]?.id
+            ?.videoId;
         url = `https://www.youtube.com/watch?v=${videoId}`;
 
         info = await getInfo(url);

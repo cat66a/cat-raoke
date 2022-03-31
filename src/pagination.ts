@@ -62,24 +62,24 @@ export class Pagination {
    * @type {MessageActionRow}
    * @private
    */
-  private _actionRow: MessageActionRow;
+  private _actionRow!: MessageActionRow;
 
   /**
    * The same _actionRow but with all buttons disabled
    */
-  private _actionRowEnd: MessageActionRow;
+  private _actionRowEnd!: MessageActionRow;
 
   /**
    * Pages
    * @type {Array<MessageEmbed>}
    */
-  public pages: Array<MessageEmbed>;
+  public pages!: Array<MessageEmbed>;
 
   /**
    * Authorized Users
    * @type {Array<Snowflake>}
    */
-  public authorizedUsers: Array<Snowflake>;
+  public authorizedUsers!: Array<Snowflake>;
 
   public updatePagesCB?: (pages?: this["pages"]) => this["pages"];
   public transformPageCB?: (page: MessageEmbed) => MessageEmbed;
@@ -186,7 +186,9 @@ export class Pagination {
       .setLabel(`${buttons.back.label}`)
       .setStyle(buttons.back.style)
       .setCustomId(`back-${this._key}`);
-    if (buttons.back.emoji !== "") backButton.setEmoji(buttons.back.emoji);
+    if (buttons.back.emoji !== "") {
+      backButton.setEmoji(buttons.back.emoji as EmojiIdentifierResolvable);
+    }
     const pageButton = new MessageButton()
       .setLabel(this._getPageLabel())
       .setStyle("SECONDARY")
@@ -262,7 +264,7 @@ export class Pagination {
     });
     collector.on(
       "end",
-      async (collected: Collection<Snowflake, Interaction>) => {
+      async (_collected: Collection<Snowflake, Interaction>) => {
         this._actionRow.components.forEach((component) =>
           component.setDisabled(true)
         );

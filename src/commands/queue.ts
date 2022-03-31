@@ -60,7 +60,7 @@ class QueueCommand extends MusicSlashCommand {
       public_: true,
     });
   }
-  async execute(
+  override async execute(
     interaction: CommandInteraction,
     subscription: void | MusicSubscription,
   ): Promise<void> {

@@ -5,7 +5,7 @@ class PingCommand extends BaseSlashCommand {
   constructor() {
     super({ name: "ping", description: "pong" }, { public_: true });
   }
-  async execute(interaction: CommandInteraction): Promise<void> {
+  override async execute(interaction: CommandInteraction): Promise<void> {
     return interaction.reply("Pong 🏓");
   }
 }

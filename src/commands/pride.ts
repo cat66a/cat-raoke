@@ -1,4 +1,8 @@
-import { CommandInteraction, MessageEmbed } from "discord.js";
+import {
+  CommandInteraction,
+  CommandInteractionOption,
+  MessageEmbed,
+} from "discord.js";
 import { getFlagNames, getFlagUrl } from "../pfpLgbtApiWrapper.js";
 import { BaseSlashCommand } from "../slashCommand.js";
 
@@ -29,7 +33,7 @@ class PrideFlagCommand extends BaseSlashCommand {
       ],
     }, { public_: true });
   }
-  async execute(interaction: CommandInteraction): Promise<void> {
+  override async execute(interaction: CommandInteraction): Promise<void> {
     await interaction.deferReply();
     const subcommand = interaction.options.getSubcommand();
 
@@ -46,7 +50,8 @@ class PrideFlagCommand extends BaseSlashCommand {
       case "flag":
         const embed = new MessageEmbed();
 
-        const flagType = interaction.options!.data[0].options[0]!
+        // @ts-ignore
+        const flagType = interaction.options!.data[0].options[0]
           .value as string;
 
         embed.setImage(getFlagUrl(flagType));

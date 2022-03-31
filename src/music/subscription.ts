@@ -17,6 +17,7 @@ import type { Track } from "./track.js";
 import { promisify } from "node:util";
 import {
   CommandInteraction,
+  Guild,
   GuildChannelManager,
   GuildMember,
   GuildTextBasedChannel,
@@ -47,13 +48,13 @@ export const joinVCAndCreateSubscription = async (
         }),
         {
           textChannelId: interaction.channelId,
-          guildChannels: interaction.guild.channels,
+          guildChannels: (interaction.guild as Guild).channels,
           voiceChannelId: voiceChannel.id,
         },
       );
 
       subscription.voiceConnection.on("error", console.warn);
-      subscriptions.set(interaction.guildId, subscription);
+      subscriptions.set(interaction.guildId as string, subscription);
     }
 
     if (!subscription) {
@@ -118,6 +119,7 @@ export class MusicSubscription {
     this.queue = [];
 
     this.voiceConnection.on(
+      // @ts-ignore
       "stateChange",
       async (_: any, newState: VoiceConnectionState) => {
         if (newState.status === VoiceConnectionStatus.Disconnected) {
@@ -194,6 +196,7 @@ export class MusicSubscription {
 
     // Configure audio player
     this.audioPlayer.on(
+      // @ts-ignore
       "stateChange",
       (oldState: AudioPlayerState, newState: AudioPlayerState) => {
         if (

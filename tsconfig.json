@@ -5,8 +5,11 @@
     "moduleResolution": "Node",
     "esModuleInterop": true,
     "noImplicitAny": true,
+    "noImplicitOverride": true,
+    "noUnusedParameters": true,
     "removeComments": true,
     "preserveConstEnums": true,
+    "strict": true,
     "outDir": "./built",
     "sourceMap": true
   },

@@ -2,6 +2,7 @@ import { Client, CommandInteraction, Intents } from "discord.js";
 import { commands, loadCommands } from "./commands.js";
 import { botToken, debugMode } from "./loadedConfig.js";
 import { restLoadApplicationCommands } from "./rest.js";
+import { BaseSlashCommand } from "./slashCommand.js";
 
 const { FLAGS } = Intents;
 
@@ -23,7 +24,7 @@ export async function init() {
   });
 
   client.on("ready", async () => {
-    console.log(`Ready as ${client.user.tag}`);
+    console.log(`Ready as ${client.user?.tag}`);
   });
 
   client.on("interactionCreate", async (interaction) => {
@@ -39,7 +40,7 @@ export async function init() {
         }
 
         console.log(commandName);
-        const command = commands.get(commandName);
+        const command = commands.get(commandName) as BaseSlashCommand;
 
         await command.preExec(interaction);
       } catch (error) {
@@ -56,7 +57,7 @@ export async function init() {
 
 async function interactionErrorHandler(
   interaction: CommandInteraction,
-  error: Error,
+  error: any,
 ) {
   if (!interaction.deferred) await interaction.deferReply();
   await interaction.followUp(

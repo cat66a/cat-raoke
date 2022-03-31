@@ -65,7 +65,7 @@ export async function restDeleteApplicationCommands(
   }
 
   if (mode === 0 || 2) {
-    await Promise.all(guildIDs.map(async (guildId) => {
+    await Promise.all((guildIDs as Snowflake[]).map(async (guildId) => {
       const getGuildCommands = await rest.get(
         Routes.applicationGuildCommands(client_id, guildId),
       ) as [{ id: string }];
