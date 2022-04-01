@@ -8,7 +8,7 @@ const { MusicSubscription, joinVCAndCreateSubscription, subscriptions } =
   await import("../music/subscription.js");
 const { Track } = await import("../music/track.js");
 const { commandPropertiesArray, commands, loadCommands } = await import(
-  "../commands.js"
+  "../loadCommands.js"
 );
 const botConfig = await import("../loadedConfig.js");
 const {

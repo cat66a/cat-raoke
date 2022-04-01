@@ -13,7 +13,7 @@ export async function init() {
 
   console.log('Loading commands inside "commands" dir');
   await loadCommands();
-  console.log("Commands successfully loaded");
+  console.log("Commands successfully loaded", Array.from(commands.keys()).join(" - "));
 
   console.log("Started reloading application (/) commands.");
   await restLoadApplicationCommands();
