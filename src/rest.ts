@@ -1,6 +1,6 @@
 import { REST } from "@discordjs/rest";
 import { Routes } from "discord-api-types/v9";
-import { botToken, debugMode, mainGuildID } from "./loadedConfig.js";
+import { botToken, debugMode, mainGuildID } from "./config.js";
 import { commandPropertiesArray } from "./loadCommands.js";
 import { Snowflake } from "discord.js";
 import { BaseSlashCommand } from "./slashCommand.js";

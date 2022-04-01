@@ -1,6 +1,6 @@
 import { Client, CommandInteraction, Intents } from "discord.js";
-import { commands, loadCommands } from "./commands.js";
-import { botToken, debugMode } from "./loadedConfig.js";
+import { commands, loadCommands } from "./loadCommands.js";
+import { botToken, debugMode } from "./config.js";
 import { restLoadApplicationCommands } from "./rest.js";
 import { BaseSlashCommand } from "./slashCommand.js";
 

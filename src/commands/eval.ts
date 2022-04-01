@@ -10,7 +10,7 @@ const { Track } = await import("../music/track.js");
 const { commandPropertiesArray, commands, loadCommands } = await import(
   "../loadCommands.js"
 );
-const botConfig = await import("../loadedConfig.js");
+const botConfig = await import("../config.js");
 const {
   restLoadApplicationCommands,
   restLoadPublicCommands,

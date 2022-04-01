@@ -1,4 +1,4 @@
-import { setDebugMode } from "./loadedConfig.js";
+import { setDebugMode } from "./config.js";
 
 const args = process.argv.slice(2);
 

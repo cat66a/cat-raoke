@@ -1,7 +1,7 @@
 // This function cleans up and prepares the
 // result of our eval command input for sending
 
-import { botToken } from "./loadedConfig.js";
+import { botToken } from "./config.js";
 
 // to the channel
 export const clean = async (text: any): Promise<string> => {
