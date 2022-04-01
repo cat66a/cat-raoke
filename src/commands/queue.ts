@@ -2,7 +2,7 @@ import { AudioPlayerStatus, AudioResource } from "@discordjs/voice";
 import { CommandInteraction, MessageEmbed } from "discord.js";
 import { MusicSubscription } from "../music/subscription.js";
 import { Track } from "../music/track.js";
-import { Pagination } from "../pagination.js";
+import { Pagination } from "../utils/pagination.js";
 import { MusicSlashCommand } from "../slashCommand.js";
 
 const titleMaxLength = 50;

@@ -3,7 +3,8 @@
 import FormData from "form-data";
 import fetch, { RequestInfo, RequestInit } from "node-fetch";
 
-export const baseUrl = "https://api.pfp.lgbt/v5/";
+export const version = "v5";
+export const baseUrl = `https://api.pfp.lgbt/${version}/`;
 
 // @ts-ignore
 async function _fetch(

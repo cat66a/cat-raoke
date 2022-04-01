@@ -1,6 +1,6 @@
 import { CommandInteraction } from "discord.js";
 
-const { clean } = await import("../utils.js");
+const { clean } = await import("../utils/miscUtils.js");
 const { AdminSlashCommand, BaseSlashCommand, MusicSlashCommand } = await import(
   "../slashCommand.js"
 );
@@ -17,7 +17,7 @@ const {
   restLoadPrivateCommands,
   restDeleteApplicationCommands,
 } = await import("../rest.js");
-const lgbt = await import("../pfpLgbtApiWrapper.js");
+const lgbt = await import("../utils/apiWrappers/pfpLgbtApi.js");
 
 class EvalCommand extends AdminSlashCommand {
   constructor() {

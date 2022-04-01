@@ -3,7 +3,7 @@ import {
   CommandInteractionOption,
   MessageEmbed,
 } from "discord.js";
-import { getFlagNames, getFlagUrl } from "../pfpLgbtApiWrapper.js";
+import { getFlagNames, getFlagUrl } from "../utils/apiWrappers/pfpLgbtApi.js";
 import { BaseSlashCommand } from "../slashCommand.js";
 
 class PrideFlagCommand extends BaseSlashCommand {

@@ -6,14 +6,14 @@ import {
   createAudioResource,
   demuxProbe,
 } from "@discordjs/voice";
-import { searchVideos } from "./youtubeApiWrapper.js";
+import { searchVideos } from "../utils/apiWrappers/youtubeApi.js";
 
 import pkg from "youtube-dl-exec";
 // @ts-ignore
 const { raw: ytdl } = pkg;
 
 import ytdl_core from "ytdl-core";
-import { ConvertedSeconds, convertSeconds } from "../convertSeconds.js";
+import { ConvertedSeconds, convertSeconds } from "../utils/convertSeconds.js";
 import { youtube_v3 } from "googleapis";
 const { getInfo } = ytdl_core;
 
